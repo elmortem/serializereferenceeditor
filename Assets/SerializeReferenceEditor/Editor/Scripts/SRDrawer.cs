@@ -134,6 +134,9 @@ public class SRDrawer : PropertyDrawer
 				_element.objectReferenceValue = null;
 			_element.managedReferenceValue = null;
 			_element.serializedObject.ApplyModifiedProperties();
+
+			_element = null;
+			return;
 		}
 
 		if(_attr == null)
