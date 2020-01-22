@@ -29,7 +29,9 @@ public class SRDrawer : PropertyDrawer
 			}
 
 			Event e = Event.current;
-			if(e.type == EventType.ContextClick && e.button == 1 && position.Contains(e.mousePosition) && !e.control)
+			var labelPosition = position;
+			labelPosition.height = 20f;
+			if(e.type == EventType.ContextClick && e.button == 1 && labelPosition.Contains(e.mousePosition) && !e.control)
 			{
 				GenericMenu context = new GenericMenu();
 
