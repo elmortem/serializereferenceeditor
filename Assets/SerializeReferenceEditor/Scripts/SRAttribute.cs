@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
+[AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
 public class SRAttribute : PropertyAttribute
 {
 	private static Dictionary<Type, Type[]> _typeCache = new Dictionary<Type, Type[]>();
@@ -80,6 +81,11 @@ public class SRAttribute : PropertyAttribute
 	}
 
 	public virtual void OnCreate(object instance)
+	{
+
+	}
+
+	public virtual void OnChange(object instance)
 	{
 
 	}
