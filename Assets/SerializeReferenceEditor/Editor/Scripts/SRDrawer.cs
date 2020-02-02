@@ -26,19 +26,25 @@ public class SRDrawer : PropertyDrawer
 			_attr = attribute as SRAttribute;
 		}
 
-		float height = EditorGUI.GetPropertyHeight(property, label, false);
+		float buttonWidth = 50f;
+		float buttonHeight = EditorGUI.GetPropertyHeight(property, label, false);
 
 		EditorGUI.BeginChangeCheck();
 
 		var propertyRect = position;
-		propertyRect.width -= height;
+		propertyRect.width -= buttonWidth;
 		EditorGUI.PropertyField(propertyRect, property, label, true);
 
-		var buttonRect = new Rect(position.x + propertyRect.width, position.y, height, height);
-		if(EditorGUI.DropdownButton(buttonRect, new GUIContent(""), FocusType.Passive))
+		var typeName = "Type"; //TODO typeof(_element.managedReferenceValue).Name
+
+		var bgColor = GUI.backgroundColor;
+		GUI.backgroundColor = Color.green;
+		var buttonRect = new Rect(position.x + propertyRect.width, position.y, buttonWidth, buttonHeight);
+		if(EditorGUI.DropdownButton(buttonRect, new GUIContent(typeName), FocusType.Passive))
 		{
 			ShowMenu(true);
 		}
+		GUI.backgroundColor = bgColor;
 
 		if(EditorGUI.EndChangeCheck() && _attr != null)
 		{
