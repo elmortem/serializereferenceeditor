@@ -26,7 +26,10 @@ public class SRDrawer : PropertyDrawer
 			_attr = attribute as SRAttribute;
 		}
 
-		float buttonWidth = 50f;
+		var typeName = GetTypeName(_element.managedReferenceFullTypename);
+		var typeNameContent = new GUIContent(typeName);
+
+		float buttonWidth = 10f + GUI.skin.button.CalcSize(typeNameContent).x;
 		float buttonHeight = EditorGUI.GetPropertyHeight(property, label, false);
 
 		EditorGUI.BeginChangeCheck();
@@ -35,12 +38,10 @@ public class SRDrawer : PropertyDrawer
 		propertyRect.width -= buttonWidth;
 		EditorGUI.PropertyField(propertyRect, property, label, true);
 
-		var typeName = "Type"; //TODO typeof(_element.managedReferenceValue).Name
-
 		var bgColor = GUI.backgroundColor;
 		GUI.backgroundColor = Color.green;
 		var buttonRect = new Rect(position.x + propertyRect.width, position.y, buttonWidth, buttonHeight);
-		if(EditorGUI.DropdownButton(buttonRect, new GUIContent(typeName), FocusType.Passive))
+		if(EditorGUI.DropdownButton(buttonRect, typeNameContent, FocusType.Passive))
 		{
 			ShowMenu(true);
 		}
@@ -201,5 +202,18 @@ public class SRDrawer : PropertyDrawer
 		SerializedObject serializedTargetObject = new SerializedObject(targetObject);
 
 		return serializedTargetObject.FindProperty(pathToArray);
+	}
+
+	private static string GetTypeName(string typeName)
+	{
+		var index = typeName.LastIndexOf(' ');
+		if(index >= 0)
+			return typeName.Substring(index + 1);
+
+		index = typeName.LastIndexOf('.');
+		if(index >= 0)
+			return typeName.Substring(index + 1);
+
+		return typeName;
 	}
 }

@@ -2,8 +2,12 @@
 
 Convenient editor for fields marked with the SerializeReference attribute.
 
-![Screenshot](/Screenshot.png)
+![Screenshot](/Screenshot2.png)
 
-Support Unity 2019.3, arrays and single elements.
+You can specify a base type or a list of types. Including the interface.
+Allows you to modify the array, list and single element. Displays the current field type.
 
-Free for use.
+Support Unity 2019.3, 2020.1 alpha.
+
+Use for free.
+Enjoy!
