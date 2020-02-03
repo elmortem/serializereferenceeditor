@@ -206,6 +206,9 @@ public class SRDrawer : PropertyDrawer
 
 	private static string GetTypeName(string typeName)
 	{
+		if(string.IsNullOrEmpty(typeName))
+			return "(empty)";
+
 		var index = typeName.LastIndexOf(' ');
 		if(index >= 0)
 			return typeName.Substring(index + 1);
