@@ -1,6 +1,6 @@
-# Unity SerializeReference Editor
+# Unity SerializeReference Property Drawer
 
-Convenient editor for fields marked with the SerializeReference attribute.
+Convenient property drawer for fields marked with the SerializeReference attribute.
 
 ![Screenshot](/Screenshot2.png)
 
