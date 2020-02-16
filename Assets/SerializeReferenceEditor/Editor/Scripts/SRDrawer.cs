@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-[CustomPropertyDrawer(typeof(SRAttribute))]
+[CustomPropertyDrawer(typeof(SRAttribute), false)]
 public class SRDrawer : PropertyDrawer
 {
 	private SRAttribute _attr;
@@ -15,7 +15,7 @@ public class SRDrawer : PropertyDrawer
 
 	public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 	{
-		if(_element == null)
+		if(_element != property)
 		{
 			_element = property;
 			_array = GetParentArray(property, out _elementIndex);
@@ -66,17 +66,21 @@ public class SRDrawer : PropertyDrawer
 		{
 			context.AddItem(new GUIContent("Delete"), false, OnMenuItemClick, "Delete");
 			context.AddItem(new GUIContent("Insert"), false, OnMenuItemClick, "Insert");
-			//TODO context.AddItem(new GUIContent("Add"), false, OnMenuItemClick, "Add");
+			context.AddItem(new GUIContent("Add"), false, OnMenuItemClick, "Add");
 			context.AddSeparator("");
 		}
 
-		if(_attr != null && _attr.Types != null)
+		if(_attr.Types == null)
+			_attr.SetTypeByName(_element.managedReferenceFieldTypename);
+
+		var types = _attr.Types;
+		if(types != null)
 		{
 			context.AddItem(new GUIContent("Erase"), false, OnMenuItemClick, "Erase");
 			context.AddSeparator("");
-			for(int i = 0; i < _attr.Types.Length; ++i)
+			for(int i = 0; i < types.Length; ++i)
 			{
-				context.AddItem(new GUIContent(_attr.Types[i].Path), false, OnMenuItemClick, _attr.Types[i].Path);
+				context.AddItem(new GUIContent(types[i].Path), false, OnMenuItemClick, types[i].Path);
 			}
 		}
 
@@ -149,9 +153,6 @@ public class SRDrawer : PropertyDrawer
 			_element = null;
 			return;
 		}
-
-		if(_attr == null)
-			return;
 
 		var typeInfo = _attr.TypeInfoByPath(cmd);
 		if(typeInfo == null)

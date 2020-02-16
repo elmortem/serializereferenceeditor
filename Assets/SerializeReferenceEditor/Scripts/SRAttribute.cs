@@ -18,17 +18,22 @@ public class SRAttribute : PropertyAttribute
 
 	public TypeInfo[] Types { get; private set; }
 
-	public SRAttribute(Type type)
+	public SRAttribute()
 	{
-		if(type == null)
+		Types = null;
+	}
+
+	public SRAttribute(Type baseType)
+	{
+		if(baseType == null)
 		{
 			Debug.LogError("[SRAttribute] Incorrect type.");
 		}
 
-		Types = GetTypeInfos(GetChildTypes(type));
+		Types = GetTypeInfos(GetChildTypes(baseType));
 	}
 
-	public SRAttribute(Type[] types)
+	public SRAttribute(params Type[] types)
 	{
 		if(types == null || types.Length <= 0)
 		{
@@ -36,6 +41,21 @@ public class SRAttribute : PropertyAttribute
 		}
 
 		Types = GetTypeInfos(types);
+	}
+
+	public void SetTypeByName(string typeName)
+	{
+		if(string.IsNullOrEmpty(typeName))
+		{
+			Debug.LogError("[SRAttribute] Incorrect type name.");
+		}
+		var type = GetTypeByName(typeName);
+		if(type == null)
+		{
+			Debug.LogError("[SRAttribute] Incorrect type.");
+		}
+
+		Types = GetTypeInfos(GetChildTypes(type));
 	}
 
 	public TypeInfo TypeInfoByPath(string path)
@@ -58,11 +78,11 @@ public class SRAttribute : PropertyAttribute
 		return result;
 	}
 
-	public Type[] GetChildTypes(Type type)
+	public static Type[] GetChildTypes(Type type)
 	{
 		Type[] result;
-		//if(_typeCache.TryGetValue(type, out result))
-		//	return result;
+		if(_typeCache.TryGetValue(type, out result))
+			return result;
 
 		if(type.IsInterface)
 		{
@@ -78,6 +98,18 @@ public class SRAttribute : PropertyAttribute
 			_typeCache[type] = result;
 
 		return result;
+	}
+
+	public static Type GetTypeByName(string typeName)
+	{
+		if(string.IsNullOrEmpty(typeName))
+			return null;
+
+		var typeSplit = typeName.Split(char.Parse(" "));
+		var typeAssembly = typeSplit[0];
+		var typeClass = typeSplit[1];
+
+		return Type.GetType(typeClass + ", " + typeAssembly);
 	}
 
 	public virtual void OnCreate(object instance)

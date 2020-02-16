@@ -242,11 +242,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 002f58c1f020a4c52bd155d06203727f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DataArray:
+  DataOneTwoArray:
   - id: 0
   - id: 1
+  DataAllArray:
+  - id: 2
+  - id: 2
+  - id: 3
   DataSingle:
-    id: 2
+    id: 4
   references:
     version: 1
     00000000:
@@ -260,10 +264,20 @@ MonoBehaviour:
         DataName: Data2
         Int: 0
     00000002:
+      type: {class: Data1, ns: , asm: Assembly-CSharp}
+      data:
+        DataName: Data1
+        Str: 
+    00000003:
       type: {class: Data3, ns: , asm: Assembly-CSharp}
       data:
         DataName: Data3
-        Float: 0
+        Float: 0.783
+    00000004:
+      type: {class: Data3, ns: , asm: Assembly-CSharp}
+      data:
+        DataName: Data3
+        Float: 0.266
 --- !u!4 &1173839736
 Transform:
   m_ObjectHideFlags: 0

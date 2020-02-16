@@ -5,10 +5,14 @@ using UnityEngine;
 public class DataHolder : MonoBehaviour
 {
 	[SerializeReference]
-	[SRDemo(typeof(AbstractData))]
-	public AbstractData[] DataArray;
+	[SRDemo(typeof(Data1), typeof(Data2))]
+	public AbstractData[] DataOneTwoArray;
 
 	[SerializeReference]
 	[SRDemo(typeof(AbstractData))]
+	public AbstractData[] DataAllArray;
+
+	[SerializeReference]
+	[SRDemo]
 	public AbstractData DataSingle;
 }

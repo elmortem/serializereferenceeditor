@@ -5,11 +5,15 @@ using UnityEngine;
 
 public class SRDemoAttribute : SRAttribute
 {
-	public SRDemoAttribute(Type type) : base(type)
+	public SRDemoAttribute() : base()
 	{
 	}
 
-	public SRDemoAttribute(Type[] types) : base(types)
+	public SRDemoAttribute(Type baseType) : base(baseType)
+	{
+	}
+
+	public SRDemoAttribute(params Type[] types) : base(types)
 	{
 	}
 
