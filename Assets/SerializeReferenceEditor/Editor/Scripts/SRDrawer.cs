@@ -5,29 +5,45 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+public class SRAction
+{
+	public SerializedProperty Property;
+	public string Command;
+
+	public SRAction(SerializedProperty p, string c)
+	{
+		Property = p;
+		Command = c;
+	}
+}
+
 [CustomPropertyDrawer(typeof(SRAttribute), false)]
 public class SRDrawer : PropertyDrawer
 {
 	private SRAttribute _attr;
-	private SerializedProperty _element;
 	private SerializedProperty _array;
-	private int _elementIndex;
+	private Dictionary<SerializedProperty, int> _elementIndexes = new Dictionary<SerializedProperty, int>();
 
 	public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 	{
-		if(_element != property)
+		int index;
+		if(_array == null)
 		{
-			_element = property;
-			_array = GetParentArray(property, out _elementIndex);
+			_array = GetParentArray(property, out index);
 		}
+		else
+		{
+			index = GetArrayIndex(property);
+		}
+		_elementIndexes[property] = index;
 
 		if(_attr == null)
 		{
 			_attr = attribute as SRAttribute;
 		}
 
-		var typeName = GetTypeName(_element.managedReferenceFullTypename);
-		var typeNameContent = new GUIContent(typeName);
+		var typeName = GetTypeName(property.managedReferenceFullTypename);
+		var typeNameContent = new GUIContent(typeName + (_array != null ? ("[" + index + "]") : ""));
 
 		float buttonWidth = 10f + GUI.skin.button.CalcSize(typeNameContent).x;
 		float buttonHeight = EditorGUI.GetPropertyHeight(property, label, false);
@@ -43,7 +59,7 @@ public class SRDrawer : PropertyDrawer
 		var buttonRect = new Rect(position.x + propertyRect.width, position.y, buttonWidth, buttonHeight);
 		if(EditorGUI.DropdownButton(buttonRect, typeNameContent, FocusType.Passive))
 		{
-			ShowMenu(true);
+			ShowMenu(property, true);
 		}
 		GUI.backgroundColor = bgColor;
 
@@ -58,29 +74,30 @@ public class SRDrawer : PropertyDrawer
 		return EditorGUI.GetPropertyHeight(property, label, true);
 	}
 
-	private void ShowMenu(bool applyArray)
+	private void ShowMenu(SerializedProperty property, bool applyArray)
 	{
 		GenericMenu context = new GenericMenu();
 
 		if(_array != null && applyArray)
 		{
-			context.AddItem(new GUIContent("Delete"), false, OnMenuItemClick, "Delete");
-			context.AddItem(new GUIContent("Insert"), false, OnMenuItemClick, "Insert");
-			context.AddItem(new GUIContent("Add"), false, OnMenuItemClick, "Add");
+			int index = _elementIndexes[property];
+			context.AddItem(new GUIContent("Delete"), false, OnMenuItemClick, new SRAction(property, "Delete"));
+			context.AddItem(new GUIContent("Insert"), false, OnMenuItemClick, new SRAction(property, "Insert"));
+			context.AddItem(new GUIContent("Add"), false, OnMenuItemClick, new SRAction(property, "Add"));
 			context.AddSeparator("");
 		}
 
 		if(_attr.Types == null)
-			_attr.SetTypeByName(_element.managedReferenceFieldTypename);
+			_attr.SetTypeByName(property.managedReferenceFieldTypename);
 
 		var types = _attr.Types;
 		if(types != null)
 		{
-			context.AddItem(new GUIContent("Erase"), false, OnMenuItemClick, "Erase");
+			context.AddItem(new GUIContent("Erase"), false, OnMenuItemClick, new SRAction(property, "Erase"));
 			context.AddSeparator("");
 			for(int i = 0; i < types.Length; ++i)
 			{
-				context.AddItem(new GUIContent(types[i].Path), false, OnMenuItemClick, types[i].Path);
+				context.AddItem(new GUIContent(types[i].Path), false, OnMenuItemClick, new SRAction(property, types[i].Path));
 			}
 		}
 
@@ -89,68 +106,71 @@ public class SRDrawer : PropertyDrawer
 
 	public void OnMenuItemClick(object userData)
 	{
-		string cmd = (string)userData;
+		var action = (SRAction)userData;
+		var cmd = action.Command;
+		var element = action.Property;
+		var index = -1;
+		if(_array != null)
+			index = _elementIndexes[element];
 
-		_element.serializedObject.UpdateIfRequiredOrScript();
+		element.serializedObject.UpdateIfRequiredOrScript();
 
-		if(_array != null && _elementIndex >= 0 && _elementIndex < _array.arraySize)
+		if(_array != null && index >= 0 && index < _array.arraySize)
 		{
 			_array.serializedObject.UpdateIfRequiredOrScript();
 
 			if(cmd == "Delete")
 			{
-				Undo.RegisterCompleteObjectUndo(_array.serializedObject.targetObject, "Delete element at " + _elementIndex);
+				Undo.RegisterCompleteObjectUndo(_array.serializedObject.targetObject, "Delete element at " + index);
 				Undo.FlushUndoRecordObjects();
 
-				_element.managedReferenceValue = null;
+				element.managedReferenceValue = null;
 
-				_array.DeleteArrayElementAtIndex(_elementIndex);
+				_array.DeleteArrayElementAtIndex(index);
 				_array.serializedObject.ApplyModifiedProperties();
 
-				_element = null;
+				_array = null;
+
 				return;
 			}
 			else if(cmd == "Insert")
 			{
-				Undo.RegisterCompleteObjectUndo(_array.serializedObject.targetObject, "Insert element at " + _elementIndex);
+				Undo.RegisterCompleteObjectUndo(_array.serializedObject.targetObject, "Insert element at " + index);
 				Undo.FlushUndoRecordObjects();
 
-				_array.InsertArrayElementAtIndex(_elementIndex);
+				_array.InsertArrayElementAtIndex(index);
 				_array.serializedObject.ApplyModifiedProperties();
 
-				var newElement = _array.GetArrayElementAtIndex(_elementIndex);
+				var newElement = _array.GetArrayElementAtIndex(index);
 				newElement.managedReferenceValue = null;
 				newElement.serializedObject.ApplyModifiedProperties();
 
-				_element = null;
 				return;
 			}
 			else if(cmd == "Add")
 			{
-				Undo.RegisterCompleteObjectUndo(_array.serializedObject.targetObject, "Add element at " + (_elementIndex + 1));
+				Undo.RegisterCompleteObjectUndo(_array.serializedObject.targetObject, "Add element at " + (index + 1));
 				Undo.FlushUndoRecordObjects();
 
-				_array.InsertArrayElementAtIndex(_elementIndex + 1);
+				_array.InsertArrayElementAtIndex(index + 1);
 				_array.serializedObject.ApplyModifiedProperties();
 
-				var newElement = _array.GetArrayElementAtIndex(_elementIndex + 1);
+				var newElement = _array.GetArrayElementAtIndex(index + 1);
 				newElement.managedReferenceValue = null;
 				newElement.serializedObject.ApplyModifiedProperties();
 
-				_element = null;
 				return;
 			}
 		}
 
 		if(cmd == "Erase")
 		{
-			Undo.RegisterCompleteObjectUndo(_element.serializedObject.targetObject, "Erase element");
+			Undo.RegisterCompleteObjectUndo(element.serializedObject.targetObject, "Erase element");
 			Undo.FlushUndoRecordObjects();
 
-			_element.managedReferenceValue = null;
-			_element.serializedObject.ApplyModifiedProperties();
+			element.managedReferenceValue = null;
+			element.serializedObject.ApplyModifiedProperties();
 
-			_element = null;
 			return;
 		}
 
@@ -161,30 +181,25 @@ public class SRDrawer : PropertyDrawer
 			return;
 		}
 
-		Undo.RegisterCompleteObjectUndo(_element.serializedObject.targetObject, "Create instance of " + typeInfo.Type);
+		Undo.RegisterCompleteObjectUndo(element.serializedObject.targetObject, "Create instance of " + typeInfo.Type);
 		Undo.FlushUndoRecordObjects();
 
 		var instance = Activator.CreateInstance(typeInfo.Type);
 		_attr.OnCreate(instance);
 
-		_element.managedReferenceValue = instance;
-		_element.serializedObject.ApplyModifiedProperties();
+		element.managedReferenceValue = instance;
+		element.serializedObject.ApplyModifiedProperties();
 	}
 
 	private static SerializedProperty GetParentArray(SerializedProperty element, out int index)
 	{
-		index = -1;
+		index = GetArrayIndex(element);
+		if(index < 0)
+			return null;
 
 		string propertyPath = element.propertyPath;
-		if(!propertyPath.Contains(".Array.data[") || !propertyPath.EndsWith("]"))
-			return null;
 
 		string[] fullPathSplit = propertyPath.Split('.');
-
-		string ending = fullPathSplit[fullPathSplit.Length - 1];
-		index = 0;
-		if(!int.TryParse(ending.Replace("data[", "").Replace("]", ""), out index))
-			return null;
 
 		string pathToArray = string.Empty;
 		for(int i = 0; i < fullPathSplit.Length - 2; i++)
@@ -203,6 +218,19 @@ public class SRDrawer : PropertyDrawer
 		SerializedObject serializedTargetObject = new SerializedObject(targetObject);
 
 		return serializedTargetObject.FindProperty(pathToArray);
+	}
+
+	private static int GetArrayIndex(SerializedProperty element)
+	{
+		string propertyPath = element.propertyPath;
+		if(!propertyPath.Contains(".Array.data[") || !propertyPath.EndsWith("]"))
+			return -1;
+
+		int start = propertyPath.LastIndexOf("[");
+		var str = propertyPath.Substring(start + 1, propertyPath.Length - start - 2);
+		int index;
+		int.TryParse(str, out index);
+		return index;
 	}
 
 	private static string GetTypeName(string typeName)
