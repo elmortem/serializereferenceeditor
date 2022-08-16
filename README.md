@@ -2,7 +2,7 @@
 
 Convenient property drawer for fields marked with the SerializeReference attribute.
 
-![Screenshot](/Screenshot2.png)
+![Screenshot](Images/Screenshot2.png)
 
 You can specify a base type or a list of types. Including the interface.
 Allows you to modify the array, list and single element. Displays the current field type.
