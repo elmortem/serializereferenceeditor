@@ -1,0 +1,12 @@
+{
+  "displayName": "Serialize Reference Editor",
+  "name": "com.elmortem.serializereferenceeditor",
+  "version": "1.0.0",
+  "unity": "2019.3",
+  "description": "Custom serialize reference unity editor",
+  "keywords": [
+    "serialization",
+    "serialize reference"
+  ],
+  "category": "Editor"
+}
