@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using SerializeReferenceEditor.Scripts;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace SerializeReferenceEditor.Editor.Scripts.MissingTypesValidator.Loaders
 {
     [Serializable]
+    [SRName("Load all ScriptableObjects")]
     public class LoadAllScriptableObjects : IAssetsLoader
     {
         public bool TryLoadAssetsForCheck(List<Object> assets)
