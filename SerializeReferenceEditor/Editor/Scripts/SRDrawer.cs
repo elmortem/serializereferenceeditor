@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SerializeReferenceEditor.Editor.Scripts.SRActions;
 using SerializeReferenceEditor.Scripts;
 using UnityEditor;
 using UnityEngine;
@@ -30,12 +31,14 @@ namespace SerializeReferenceEditor.Editor.Scripts
 			float buttonWidth = 10f + GUI.skin.button.CalcSize(typeNameContent).x;
 			float buttonHeight = EditorGUI.GetPropertyHeight(property, label, false);
 
+			EditorGUI.BeginChangeCheck();
+
 			var bgColor = GUI.backgroundColor;
 			GUI.backgroundColor = Color.green;
 			var buttonRect = new Rect(position.x + position.width - buttonWidth, position.y, buttonWidth, buttonHeight);
 			if(EditorGUI.DropdownButton(buttonRect, typeNameContent, FocusType.Passive))
 			{
-				ShowMenu(property, true);
+				ShowMenu(property);
 				Event.current.Use();
 			}
 			GUI.backgroundColor = bgColor;
@@ -49,17 +52,9 @@ namespace SerializeReferenceEditor.Editor.Scripts
 			return EditorGUI.GetPropertyHeight(property, label, true);
 		}
 
-		private void ShowMenu(SerializedProperty property, bool applyArray)
+		private void ShowMenu(SerializedProperty property)
 		{
 			GenericMenu context = new GenericMenu();
-
-			if(_array != null && applyArray)
-			{
-				context.AddItem(new GUIContent("Delete"), false, OnMenuItemClick, new SRAction(property, "Delete"));
-				context.AddItem(new GUIContent("Insert"), false, OnMenuItemClick, new SRAction(property, "Insert"));
-				context.AddItem(new GUIContent("Add"), false, OnMenuItemClick, new SRAction(property, "Add"));
-				context.AddSeparator("");
-			}
 
 			if(_srAttribute.Types == null)
 				_srAttribute.SetTypeByName(property.managedReferenceFieldTypename);
@@ -67,105 +62,32 @@ namespace SerializeReferenceEditor.Editor.Scripts
 			var types = _srAttribute.Types;
 			if(types != null)
 			{
-				context.AddItem(new GUIContent("Erase"), false, OnMenuItemClick, new SRAction(property, "Erase"));
+				context.AddItem(
+					new GUIContent("Erase"),
+					false,
+					new ErasePropertySRAction(
+							property,
+							_array)
+						.Apply);
+				
 				context.AddSeparator("");
+				
 				for(int i = 0; i < types.Length; ++i)
 				{
 					var typeName = types[i].Path;
-					context.AddItem(new GUIContent(typeName), false, OnMenuItemClick, new SRAction(property, types[i].Path));
+					context.AddItem(
+						new GUIContent(typeName),
+						false,
+						new InstanceClassSRAction(
+								property,
+								_array,
+								_srAttribute,
+								types[i].Path)
+							.Apply);
 				}
 			}
 
 			context.ShowAsContext();
-		}
-
-		public void OnMenuItemClick(object userData)
-		{
-			var action = (SRAction)userData;
-			var cmd = action.Command;
-			var element = action.Property;
-			var index = -1;
-			if(_array != null)
-				index = _elementIndexes[element];
-
-			element.serializedObject.UpdateIfRequiredOrScript();
-
-			if(_array != null && index >= 0 && index < _array.arraySize)
-			{
-				_array.serializedObject.UpdateIfRequiredOrScript();
-
-				if(cmd == "Delete")
-				{
-					Undo.RegisterCompleteObjectUndo(_array.serializedObject.targetObject, "Delete element at " + index);
-					Undo.FlushUndoRecordObjects();
-
-					element.managedReferenceValue = null;
-
-					_array.DeleteArrayElementAtIndex(index);
-					_array.serializedObject.ApplyModifiedProperties();
-
-					_array = null;
-
-					return;
-				}
-
-				if(cmd == "Insert")
-				{
-					Undo.RegisterCompleteObjectUndo(_array.serializedObject.targetObject, "Insert element at " + index);
-					Undo.FlushUndoRecordObjects();
-
-					_array.InsertArrayElementAtIndex(index);
-					_array.serializedObject.ApplyModifiedProperties();
-
-					var newElement = _array.GetArrayElementAtIndex(index);
-					newElement.managedReferenceValue = null;
-					newElement.serializedObject.ApplyModifiedProperties();
-
-					return;
-				}
-
-				if(cmd == "Add")
-				{
-					Undo.RegisterCompleteObjectUndo(_array.serializedObject.targetObject, "Add element at " + (index + 1));
-					Undo.FlushUndoRecordObjects();
-
-					_array.InsertArrayElementAtIndex(index + 1);
-					_array.serializedObject.ApplyModifiedProperties();
-
-					var newElement = _array.GetArrayElementAtIndex(index + 1);
-					newElement.managedReferenceValue = null;
-					newElement.serializedObject.ApplyModifiedProperties();
-
-					return;
-				}
-			}
-
-			if(cmd == "Erase")
-			{
-				Undo.RegisterCompleteObjectUndo(element.serializedObject.targetObject, "Erase element");
-				Undo.FlushUndoRecordObjects();
-
-				element.managedReferenceValue = null;
-				element.serializedObject.ApplyModifiedProperties();
-
-				return;
-			}
-
-			var typeInfo = _srAttribute.TypeInfoByPath(cmd);
-			if(typeInfo == null)
-			{
-				Debug.LogErrorFormat("Type '{0}' not found.", cmd);
-				return;
-			}
-
-			Undo.RegisterCompleteObjectUndo(element.serializedObject.targetObject, "Create instance of " + typeInfo.Type);
-			Undo.FlushUndoRecordObjects();
-
-			var instance = Activator.CreateInstance(typeInfo.Type);
-			_srAttribute.OnCreate(instance);
-
-			element.managedReferenceValue = instance;
-			element.serializedObject.ApplyModifiedProperties();
 		}
 
 		private static SerializedProperty GetParentArray(SerializedProperty element, out int index)
@@ -231,12 +153,12 @@ namespace SerializeReferenceEditor.Editor.Scripts
 	
 		private static Type TypeByName(string className)
 		{
-			var splitedClassName = className.Split(' ');
+			var splitClassName = className.Split(' ');
 			return Type.GetType(
 				string.Format(
-					"{1}, {0}",
-					splitedClassName[0],
-					splitedClassName[1]));
+					"{0}, {1}",
+					splitClassName[1],
+					splitClassName[0]));
 		}
 	}
 }
