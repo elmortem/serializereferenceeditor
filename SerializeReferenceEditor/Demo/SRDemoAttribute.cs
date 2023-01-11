@@ -1,27 +1,28 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using SerializeReferenceEditor.Scripts;
 
-public class SRDemoAttribute : SRAttribute
+namespace SerializeReferenceEditor.Demo
 {
-	public SRDemoAttribute() : base()
+	public class SRDemoAttribute : SRAttribute
 	{
-	}
-
-	public SRDemoAttribute(Type baseType) : base(baseType)
-	{
-	}
-
-	public SRDemoAttribute(params Type[] types) : base(types)
-	{
-	}
-
-	public override void OnCreate(object instance)
-	{
-		if(instance is AbstractData)
+		public SRDemoAttribute() : base()
 		{
-			((AbstractData)instance).DataName = instance.GetType().Name;
+		}
+
+		public SRDemoAttribute(Type baseType) : base(baseType)
+		{
+		}
+
+		public SRDemoAttribute(params Type[] types) : base(types)
+		{
+		}
+
+		public override void OnCreate(object instance)
+		{
+			if(instance is AbstractData)
+			{
+				((AbstractData)instance).DataName = instance.GetType().Name;
+			}
 		}
 	}
 }
