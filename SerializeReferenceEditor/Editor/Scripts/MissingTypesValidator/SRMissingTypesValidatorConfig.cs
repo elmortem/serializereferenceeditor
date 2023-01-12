@@ -1,6 +1,7 @@
 ﻿using System;
 using SerializeReferenceEditor.Editor.Scripts.MissingTypesValidator.Loaders;
 using SerializeReferenceEditor.Editor.Scripts.MissingTypesValidator.ReportFormats;
+using SerializeReferenceEditor.Scripts;
 using UnityEngine;
 
 namespace SerializeReferenceEditor.Editor.Scripts.MissingTypesValidator
