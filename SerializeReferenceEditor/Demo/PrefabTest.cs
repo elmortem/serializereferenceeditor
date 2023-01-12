@@ -1,20 +1,22 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class PrefabTest : MonoBehaviour
+namespace SerializeReferenceEditor.Demo
 {
-	public string Title;
+	public class PrefabTest : MonoBehaviour
+	{
+		public string Title;
 
-	public GameObject Child1;
+		public GameObject Child1;
 
-	[SerializeReference]
-	[SRDemo(typeof(Data1), typeof(Data2))]
-	public List<AbstractData> DataOneTwoList;
+		[SerializeReference]
+		[SRDemo(typeof(StringData), typeof(IntegerData))]
+		public List<AbstractData> DataOneTwoList;
 
-	public GameObject Child2;
+		public GameObject Child2;
 
-	public List<DataList> DataLists;
+		public List<DataList> DataLists;
 
-	public GameObject Child3;
+		public GameObject Child3;
+	}
 }

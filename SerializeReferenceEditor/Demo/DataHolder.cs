@@ -1,18 +1,19 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class DataHolder : MonoBehaviour
+namespace SerializeReferenceEditor.Demo
 {
-	[SerializeReference]
-	[SRDemo(typeof(Data1), typeof(Data2))]
-	public AbstractData[] DataOneTwoArray;
+	public class DataHolder : MonoBehaviour
+	{
+		[SerializeReference]
+		[SRDemo(typeof(StringData), typeof(IntegerData))]
+		public AbstractData[] DataOneTwoArray;
 
-	[SerializeReference]
-	[SRDemo(typeof(AbstractData))]
-	public AbstractData[] DataAllArray;
+		[SerializeReference]
+		[SRDemo(typeof(AbstractData))]
+		public AbstractData[] DataAllArray;
 
-	[SerializeReference]
-	[SRDemo]
-	public AbstractData DataSingle;
+		[SerializeReference]
+		[SRDemo]
+		public AbstractData DataSingle;
+	}
 }
