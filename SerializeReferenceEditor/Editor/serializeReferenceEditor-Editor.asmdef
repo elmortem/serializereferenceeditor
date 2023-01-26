@@ -1,0 +1,10 @@
+{
+  "name": "serializeReferenceEditor-Editor",
+  "references": [
+    "serializeReferenceEditor"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": []
+}
