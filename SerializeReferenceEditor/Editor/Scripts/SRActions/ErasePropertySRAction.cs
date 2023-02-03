@@ -1,6 +1,6 @@
 ﻿using UnityEditor;
 
-namespace SerializeReferenceEditor.Editor.Scripts.SRActions
+namespace SerializeReferenceEditor.Editor.SRActions
 {
     public class ErasePropertySRAction : BaseSRAction
     {

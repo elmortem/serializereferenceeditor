@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace SerializeReferenceEditor.Scripts
+namespace SerializeReferenceEditor
 {
 	[AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
 	public class SRAttribute : PropertyAttribute

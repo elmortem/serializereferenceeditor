@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SerializeReferenceEditor.Scripts
+namespace SerializeReferenceEditor
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class SRNameAttribute : Attribute

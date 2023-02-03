@@ -2,7 +2,7 @@
 using JetBrains.Annotations;
 using UnityEngine;
 
-namespace SerializeReferenceEditor.Editor.Scripts.MissingTypesValidator.Loaders
+namespace SerializeReferenceEditor.Editor.MissingTypesValidator.Loaders
 {
     public interface IAssetsLoader
     {

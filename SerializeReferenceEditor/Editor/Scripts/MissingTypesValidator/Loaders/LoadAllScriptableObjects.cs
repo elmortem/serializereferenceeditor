@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using SerializeReferenceEditor.Scripts;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace SerializeReferenceEditor.Editor.Scripts.MissingTypesValidator.Loaders
+namespace SerializeReferenceEditor.Editor.MissingTypesValidator.Loaders
 {
     [Serializable]
     [SRName("Load all ScriptableObjects")]

@@ -26,6 +26,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6544989126436113910}
   m_RootOrder: 1
@@ -58,6 +59,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1326704758536715330}
   - {fileID: 7855024630022373894}
@@ -80,42 +82,49 @@ MonoBehaviour:
   Title: 
   Child1: {fileID: 8390831909742780719}
   DataOneTwoList:
-  - id: 0
+  - rid: 8191843295340527624
+  - rid: 8191843295340527625
   Child2: {fileID: 4267290173290912220}
   DataLists:
   - Title: 
     List:
-    - id: 1
-    - id: 2
-    - id: 3
-    - id: 4
+    - rid: 8191843295340527626
+    - rid: 8191843295340527627
+    - rid: 8191843295340527628
+    - rid: 8191843295340527629
   Child3: {fileID: 9080128881269449982}
   references:
-    version: 1
-    00000000:
-      type: {class: Data1, ns: , asm: Assembly-CSharp}
+    version: 2
+    RefIds:
+    - rid: 8191843295340527624
+      type: {class: StringData, ns: SerializeReferenceEditor.Demo, asm: SRDemo}
       data:
-        DataName: Data1
+        DataName: StringData
         Str: 
-    00000001:
-      type: {class: Data1, ns: , asm: Assembly-CSharp}
+    - rid: 8191843295340527625
+      type: {class: IntegerData, ns: SerializeReferenceEditor.Demo, asm: SRDemo}
       data:
-        DataName: Data1
-        Str: 
-    00000002:
-      type: {class: Data2, ns: , asm: Assembly-CSharp}
-      data:
-        DataName: Data2
+        DataName: IntegerData
         Int: 0
-    00000003:
-      type: {class: Data3, ns: , asm: Assembly-CSharp}
+    - rid: 8191843295340527626
+      type: {class: FloatData, ns: SerializeReferenceEditor.Demo, asm: SRDemo}
       data:
-        DataName: Data3
+        DataName: FloatData
         Float: 0
-    00000004:
-      type: {class: Data4, ns: , asm: Assembly-CSharp}
+    - rid: 8191843295340527627
+      type: {class: IntegerData, ns: SerializeReferenceEditor.Demo, asm: SRDemo}
       data:
-        DataName: Data4
+        DataName: IntegerData
+        Int: 0
+    - rid: 8191843295340527628
+      type: {class: StringData, ns: SerializeReferenceEditor.Demo, asm: SRDemo}
+      data:
+        DataName: StringData
+        Str: 
+    - rid: 8191843295340527629
+      type: {class: ScriptableObjectTestData, ns: SerializeReferenceEditor.Demo, asm: SRDemo}
+      data:
+        DataName: ScriptableObjectTestData
         Test: {fileID: 11400000, guid: 8f5c96aa2950d40949906618ffe3a3cd, type: 2}
 --- !u!114 &5370488343339443315
 MonoBehaviour:
@@ -129,16 +138,53 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 002f58c1f020a4c52bd155d06203727f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DataOneTwoArray: []
-  DataAllArray: []
+  DataOneTwoArray:
+  - rid: 8191843295340527630
+  - rid: 8191843295340527631
+  DataAllArray:
+  - rid: 8191843295340527632
+  - rid: 8191843295340527633
+  - rid: 8191843295340527634
+  - rid: 8191843295340527635
   DataSingle:
-    id: 0
+    rid: 8191843295340527623
   references:
-    version: 1
-    00000000:
-      type: {class: Data4, ns: , asm: Assembly-CSharp}
+    version: 2
+    RefIds:
+    - rid: 8191843295340527623
+      type: {class: ScriptableObjectTestData, ns: SerializeReferenceEditor.Demo, asm: SRDemo}
       data:
-        DataName: Data4
+        DataName: ScriptableObjectTestData
+        Test: {fileID: 11400000, guid: 8f5c96aa2950d40949906618ffe3a3cd, type: 2}
+    - rid: 8191843295340527630
+      type: {class: StringData, ns: SerializeReferenceEditor.Demo, asm: SRDemo}
+      data:
+        DataName: StringData
+        Str: 
+    - rid: 8191843295340527631
+      type: {class: IntegerData, ns: SerializeReferenceEditor.Demo, asm: SRDemo}
+      data:
+        DataName: IntegerData
+        Int: 0
+    - rid: 8191843295340527632
+      type: {class: FloatData, ns: SerializeReferenceEditor.Demo, asm: SRDemo}
+      data:
+        DataName: FloatData
+        Float: 0
+    - rid: 8191843295340527633
+      type: {class: IntegerData, ns: SerializeReferenceEditor.Demo, asm: SRDemo}
+      data:
+        DataName: IntegerData
+        Int: 0
+    - rid: 8191843295340527634
+      type: {class: StringData, ns: SerializeReferenceEditor.Demo, asm: SRDemo}
+      data:
+        DataName: StringData
+        Str: 
+    - rid: 8191843295340527635
+      type: {class: ScriptableObjectTestData, ns: SerializeReferenceEditor.Demo, asm: SRDemo}
+      data:
+        DataName: ScriptableObjectTestData
         Test: {fileID: 11400000, guid: 8f5c96aa2950d40949906618ffe3a3cd, type: 2}
 --- !u!1 &8390831909742780719
 GameObject:
@@ -166,6 +212,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6544989126436113910}
   m_RootOrder: 0
@@ -196,6 +243,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6544989126436113910}
   m_RootOrder: 2

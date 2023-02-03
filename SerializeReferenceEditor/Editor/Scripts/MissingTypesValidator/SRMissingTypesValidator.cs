@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using SerializeReferenceEditor.Editor.Scripts.MissingTypesValidator.ReportFormats;
+using SerializeReferenceEditor.Editor.MissingTypesValidator.ReportFormats;
 using UnityEditor;
 using UnityEngine;
 
-namespace SerializeReferenceEditor.Editor.Scripts.MissingTypesValidator
+namespace SerializeReferenceEditor.Editor.MissingTypesValidator
 {
     public class SRMissingTypesValidator
     {

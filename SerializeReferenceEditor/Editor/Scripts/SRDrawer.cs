@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SerializeReferenceEditor.Editor.Scripts.SRActions;
-using SerializeReferenceEditor.Scripts;
+using SerializeReferenceEditor.Editor.SRActions;
 using UnityEditor;
 using UnityEngine;
 
-namespace SerializeReferenceEditor.Editor.Scripts 
+namespace SerializeReferenceEditor.Editor 
 {
 	[CustomPropertyDrawer(typeof(SRAttribute), false)]
 	public class SRDrawer : PropertyDrawer

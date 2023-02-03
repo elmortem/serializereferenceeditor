@@ -1,6 +1,4 @@
-﻿using SerializeReferenceEditor.Scripts;
-
-namespace SerializeReferenceEditor.Demo
+﻿namespace SerializeReferenceEditor.Demo
 {
 	[SRName("Data/Simple types/String")]
 	public class StringData : AbstractData

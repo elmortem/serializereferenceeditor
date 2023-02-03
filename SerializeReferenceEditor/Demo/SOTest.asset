@@ -14,23 +14,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Title: Scriptable Object
   List:
-  - id: 0
-  - id: 1
-  - id: 2
+  - rid: 8191843295340527619
+  - rid: 8191843295340527620
+  - rid: 8191843295340527621
   references:
-    version: 1
-    00000000:
-      type: {class: Data1, ns: , asm: Assembly-CSharp}
+    version: 2
+    RefIds:
+    - rid: 8191843295340527619
+      type: {class: FloatData, ns: SerializeReferenceEditor.Demo, asm: SRDemo}
       data:
-        DataName: Data1
-        Str: 111
-    00000001:
-      type: {class: Data2, ns: , asm: Assembly-CSharp}
+        DataName: FloatData
+        Float: 0
+    - rid: 8191843295340527620
+      type: {class: IntegerData, ns: SerializeReferenceEditor.Demo, asm: SRDemo}
       data:
-        DataName: Data2
-        Int: 123
-    00000002:
-      type: {class: Data3, ns: , asm: Assembly-CSharp}
+        DataName: IntegerData
+        Int: 0
+    - rid: 8191843295340527621
+      type: {class: StringData, ns: SerializeReferenceEditor.Demo, asm: SRDemo}
       data:
-        DataName: Data3
-        Float: 0.326
+        DataName: StringData
+        Str: 

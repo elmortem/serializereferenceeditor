@@ -1,9 +1,8 @@
 ﻿using System;
-using SerializeReferenceEditor.Scripts;
 using UnityEditor;
 using UnityEngine;
 
-namespace SerializeReferenceEditor.Editor.Scripts.SRActions
+namespace SerializeReferenceEditor.Editor.SRActions
 {
     public class InstanceClassSRAction : BaseSRAction
     {

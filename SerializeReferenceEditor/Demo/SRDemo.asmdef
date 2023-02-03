@@ -1,0 +1,16 @@
+{
+    "name": "SRDemo",
+    "rootNamespace": "",
+    "references": [
+        "GUID:79ad2193969254fbd829729521e3eee3"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

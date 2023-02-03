@@ -1,5 +1,4 @@
-﻿using SerializeReferenceEditor.Scripts;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SerializeReferenceEditor.Demo
 {

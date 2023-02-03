@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace SerializeReferenceEditor.Editor.Scripts.MissingTypesValidator.ReportFormats
+namespace SerializeReferenceEditor.Editor.MissingTypesValidator.ReportFormats
 {
     public interface IAssetMissingTypeReport
     {
