@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SerializeReferenceEditor.Editor.Drawers;
 using SerializeReferenceEditor.Editor.SRActions;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace SerializeReferenceEditor.Editor 
@@ -12,8 +14,9 @@ namespace SerializeReferenceEditor.Editor
 	{
 		private SRAttribute _srAttribute;
 		private SerializedProperty _array;
-		private Dictionary<SerializedProperty, int> _elementIndexes = new Dictionary<SerializedProperty, int>();
-	
+		private Dictionary<SerializedProperty, int> _elementIndexes = new();
+		private SRTypesContainer _searchWindow;
+
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			int index;
@@ -53,40 +56,31 @@ namespace SerializeReferenceEditor.Editor
 
 		private void ShowMenu(SerializedProperty property)
 		{
-			GenericMenu context = new GenericMenu();
-
 			if(_srAttribute.Types == null)
 				_srAttribute.SetTypeByName(property.managedReferenceFieldTypename);
 
 			var types = _srAttribute.Types;
+			List<(string, BaseSRAction)> variants = new();
 			if(types != null)
 			{
-				context.AddItem(
-					new GUIContent("Erase"),
-					false,
-					new ErasePropertySRAction(
-							property,
-							_array)
-						.Apply);
-				
-				context.AddSeparator("");
-				
-				for(int i = 0; i < types.Length; ++i)
+				foreach (var type in types)
 				{
-					var typeName = types[i].Path;
-					context.AddItem(
-						new GUIContent(typeName),
-						false,
-						new InstanceClassSRAction(
+					variants.Add(
+						(
+							type.Path,
+							new InstanceClassSRAction(
 								property,
 								_array,
 								_srAttribute,
-								types[i].Path)
-							.Apply);
+								type.Path)
+							)
+					);
 				}
 			}
 
-			context.ShowAsContext();
+			if (_searchWindow == null)
+				_searchWindow = SRTypesContainer.MakeTypesContainer(property, _array, variants);
+			SearchWindow.Open(new SearchWindowContext(GUIUtility.GUIToScreenPoint(Event.current.mousePosition)), _searchWindow);
 		}
 
 		private static SerializedProperty GetParentArray(SerializedProperty element, out int index)

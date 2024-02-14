@@ -10,8 +10,12 @@ namespace SerializeReferenceEditor.Demo
 		public GameObject Child1;
 
 		[SerializeReference]
+		[SRDemo(typeof(AbstractData))]
+		public AbstractData SingleElement;
+
+		[SerializeReference]
 		[SRDemo(typeof(StringData), typeof(IntegerData))]
-		public List<AbstractData> DataOneTwoList;
+		public List<AbstractData> StringOrIntegerTypesDataList;
 
 		public GameObject Child2;
 
