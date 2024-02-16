@@ -23,13 +23,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4267290173290912220}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6544989126436113910}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6551484165175635857
 GameObject:
@@ -56,7 +56,6 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6551484165175635857}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -66,6 +65,7 @@ Transform:
   - {fileID: 7855024630022373894}
   - {fileID: 1915269040360897517}
   m_Father: {fileID: 0}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &146599816147254134
 MonoBehaviour:
@@ -81,12 +81,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Title: 
   Child1: {fileID: 8390831909742780719}
-  SingleElement:
-    rid: 2163298234794246157
   DataOneTwoList:
-  - rid: 2163298234794246159
-  - rid: 2163298234794246156
-  - rid: 2163298234794246160
+  - rid: 8191843295340527624
+  - rid: 8191843295340527625
   Child2: {fileID: 4267290173290912220}
   DataLists:
   - Title: 
@@ -99,22 +96,12 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2163298234794246156
+    - rid: 8191843295340527624
       type: {class: StringData, ns: SerializeReferenceEditor.Demo, asm: SRDemo}
       data:
         DataName: StringData
         Str: 
-    - rid: 2163298234794246157
-      type: {class: IntegerData, ns: SerializeReferenceEditor.Demo, asm: SRDemo}
-      data:
-        DataName: IntegerData
-        Int: 0
-    - rid: 2163298234794246159
-      type: {class: IntegerData, ns: SerializeReferenceEditor.Demo, asm: SRDemo}
-      data:
-        DataName: IntegerData
-        Int: 0
-    - rid: 2163298234794246160
+    - rid: 8191843295340527625
       type: {class: IntegerData, ns: SerializeReferenceEditor.Demo, asm: SRDemo}
       data:
         DataName: IntegerData
@@ -222,13 +209,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8390831909742780719}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6544989126436113910}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &9080128881269449982
 GameObject:
@@ -253,11 +240,11 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9080128881269449982}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6544989126436113910}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
