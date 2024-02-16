@@ -12,10 +12,9 @@ namespace SerializeReferenceEditor.Editor
 	[CustomPropertyDrawer(typeof(SRAttribute), false)]
 	public class SRDrawer : PropertyDrawer
 	{
+		private static readonly SRCashTypeSearchTree _cash = new();
 		private SRAttribute _srAttribute;
 		private SerializedProperty _array;
-		private Dictionary<SerializedProperty, int> _elementIndexes = new();
-		private SRTypesContainer _searchWindow;
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
@@ -24,7 +23,6 @@ namespace SerializeReferenceEditor.Editor
 				_array = GetParentArray(property, out index);
 			else
 				index = GetArrayIndex(property);
-			_elementIndexes[property] = index;
 
 			_srAttribute ??= attribute as SRAttribute;
 			var typeName = GetTypeName(property.managedReferenceFullTypename);
@@ -60,27 +58,20 @@ namespace SerializeReferenceEditor.Editor
 				_srAttribute.SetTypeByName(property.managedReferenceFieldTypename);
 
 			var types = _srAttribute.Types;
-			List<(string, BaseSRAction)> variants = new();
-			if(types != null)
+			if (types == null)
 			{
-				foreach (var type in types)
-				{
-					variants.Add(
-						(
-							type.Path,
-							new InstanceClassSRAction(
-								property,
-								_array,
-								_srAttribute,
-								type.Path)
-							)
-					);
-				}
+				Debug.LogError("Incorrect types");
+				return;
 			}
 
-			if (_searchWindow == null)
-				_searchWindow = SRTypesContainer.MakeTypesContainer(property, _array, variants);
-			SearchWindow.Open(new SearchWindowContext(GUIUtility.GUIToScreenPoint(Event.current.mousePosition)), _searchWindow);
+			var typeTreeFactory = _cash.GetTypeTreeFactory(types);
+			var srActionFactory = new SRActionFactory(
+				property,
+				_array,
+				_srAttribute);
+
+			var searchWindow = SRTypesSearchWindowProvider.MakeTypesContainer(srActionFactory, typeTreeFactory);
+			SearchWindow.Open(new SearchWindowContext(GUIUtility.GUIToScreenPoint(Event.current.mousePosition)), searchWindow);
 		}
 
 		private static SerializedProperty GetParentArray(SerializedProperty element, out int index)

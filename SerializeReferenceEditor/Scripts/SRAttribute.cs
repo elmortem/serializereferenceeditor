@@ -9,7 +9,7 @@ namespace SerializeReferenceEditor
 	[AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
 	public class SRAttribute : PropertyAttribute
 	{
-		private static Dictionary<Type, Type[]> _typeCache = new Dictionary<Type, Type[]>();
+		private static readonly Dictionary<Type, Type[]> TypeCache = new();
 
 		public class TypeInfo
 		{
@@ -24,6 +24,7 @@ namespace SerializeReferenceEditor
 			Types = null;
 		}
 
+		// ReSharper disable once MemberCanBeProtected.Global
 		public SRAttribute(Type baseType)
 		{
 			if(baseType == null)
@@ -34,6 +35,7 @@ namespace SerializeReferenceEditor
 			Types = GetTypeInfos(GetChildTypes(baseType));
 		}
 
+		// ReSharper disable once MemberCanBeProtected.Global
 		public SRAttribute(params Type[] types)
 		{
 			if(types == null || types.Length <= 0)
@@ -82,16 +84,16 @@ namespace SerializeReferenceEditor
 			
 				result[i] = new TypeInfo { 
 					Type = types[i], 
-					Path = typeName };
+					Path = typeName 
+				};
 			}
 
 			return result;
 		}
 
-		public static Type[] GetChildTypes(Type type)
+		private static Type[] GetChildTypes(Type type)
 		{
-			Type[] result;
-			if(_typeCache.TryGetValue(type, out result))
+			if(TypeCache.TryGetValue(type, out var result))
 				return result;
 
 			if (type.IsInterface)
@@ -101,12 +103,12 @@ namespace SerializeReferenceEditor
 				result = Assembly.GetAssembly(type).GetTypes().Where(t => t.IsSubclassOf(type)).ToArray();
 
 			if(result != null)
-				_typeCache[type] = result;
+				TypeCache[type] = result;
 
 			return result;
 		}
 
-		public static Type GetTypeByName(string typeName)
+		private static Type GetTypeByName(string typeName)
 		{
 			if(string.IsNullOrEmpty(typeName))
 				return null;
