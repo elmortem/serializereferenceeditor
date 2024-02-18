@@ -24,7 +24,7 @@ Allows you to change an array, a list, and a single element. Displays the curren
 public List<AbstractData> DataList = new List<AbstractData>();
 ```
 #### Result:
-![Screenshot](Images/Demo.gif)
+<img src="Images/Demo.gif" width="400">
 
 #### Additional features
 You can override SRAttribute and implement a rule for processing instantiated objects.
