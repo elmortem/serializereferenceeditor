@@ -29,7 +29,7 @@ public List<AbstractData> DataList = new List<AbstractData>();
 #### Additional features
 You can override SRAttribute and implement a rule for processing instantiated objects.
 
-You can see an example in [SRDemoAttribute.cs](serializereferenceeditor%2FDemo%2FSRDemoAttribute.cs), где был переопределён метод `OnCreate`:
+You can see an example in [SRDemoAttribute.cs](SerializeReferenceEditor%2FDemo%2FSRDemoAttribute.cs), где был переопределён метод `OnCreate`:
 ```
 public override void OnCreate(object instance)
 {
@@ -43,7 +43,7 @@ public override void OnCreate(object instance)
 ### SRNameAttribute
 Mark classes with them if you want to customize the display name and nesting hierarchy in the search tree for a specific type.
 
-Example [FloatData.cs](serializereferenceeditor%2FDemo%2FFloatData.cs):
+Example [FloatData.cs](SerializeReferenceEditor%2FDemo%2FFloatData.cs):
 ```
 [SRName("Data/Simple types/Float")]  
 public class FloatData : AbstractData
