@@ -3,7 +3,7 @@
 ![color:ff69b4](https://img.shields.io/badge/licence-MIT-blue)
 ![color:ff69b4](https://img.shields.io/badge/Unity-2019.3.x-red)
 
-This package provides the ability to edit the type of fields marked with the SerializeReference attribute in Unity editor.
+Convenient property drawer for fields marked with the SerializeReference attribute.
 
 ## Installation
 
@@ -14,7 +14,7 @@ Installation as a unity module via a git link in PackageManager or direct editin
 
 ## Main types
 ### SRAttribute
-Use it to mark the fields that you want to edit. Important note - they should also be marked with the Serializedreference attribute. You can mark the base type (including the interface) with it.
+Use it to mark the fields that you want to edit. Important note - they should also be marked with the SerializeReference attribute. You can mark the base type (including the interface) with it.
 Allows you to change an array, a list, and a single element. Displays the current field type.
 
 #### Example:
@@ -29,7 +29,7 @@ public List<AbstractData> DataList = new List<AbstractData>();
 #### Additional features
 You can override SRAttribute and implement a rule for processing instantiated objects.
 
-You can see an example in [SRDemoAttribute.cs](SerializeReferenceEditor%2FDemo%2FSRDemoAttribute.cs), где был переопределён метод `OnCreate`:
+You can see an example in [SRDemoAttribute.cs](SerializeReferenceEditor%2FDemo%2FSRDemoAttribute.cs), where the `OnCreate` method was overriden:
 ```
 public override void OnCreate(object instance)
 {
