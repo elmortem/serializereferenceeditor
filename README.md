@@ -1,6 +1,6 @@
 # Unity SerializeReference Property Drawer
 
-![color:ff69b4](https://img.shields.io/badge/licence-MIT-blue)
+[![color:ff69b4](https://img.shields.io/badge/licence-Unlicense-blue)](https://unlicense.org)
 ![color:ff69b4](https://img.shields.io/badge/Unity-2019.3.x-red)
 
 Convenient property drawer for fields marked with the SerializeReference attribute.
