@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SerializeReferenceEditor.Editor.Drawers;
 using SerializeReferenceEditor.Editor.SRActions;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace SerializeReferenceEditor.Editor 
@@ -10,10 +12,10 @@ namespace SerializeReferenceEditor.Editor
 	[CustomPropertyDrawer(typeof(SRAttribute), false)]
 	public class SRDrawer : PropertyDrawer
 	{
+		private static readonly SRCashTypeSearchTree _cash = new();
 		private SRAttribute _srAttribute;
 		private SerializedProperty _array;
-		private Dictionary<SerializedProperty, int> _elementIndexes = new Dictionary<SerializedProperty, int>();
-	
+
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			int index;
@@ -21,7 +23,6 @@ namespace SerializeReferenceEditor.Editor
 				_array = GetParentArray(property, out index);
 			else
 				index = GetArrayIndex(property);
-			_elementIndexes[property] = index;
 
 			_srAttribute ??= attribute as SRAttribute;
 			var typeName = GetTypeName(property.managedReferenceFullTypename);
@@ -53,40 +54,24 @@ namespace SerializeReferenceEditor.Editor
 
 		private void ShowMenu(SerializedProperty property)
 		{
-			GenericMenu context = new GenericMenu();
-
 			if(_srAttribute.Types == null)
 				_srAttribute.SetTypeByName(property.managedReferenceFieldTypename);
 
 			var types = _srAttribute.Types;
-			if(types != null)
+			if (types == null)
 			{
-				context.AddItem(
-					new GUIContent("Erase"),
-					false,
-					new ErasePropertySRAction(
-							property,
-							_array)
-						.Apply);
-				
-				context.AddSeparator("");
-				
-				for(int i = 0; i < types.Length; ++i)
-				{
-					var typeName = types[i].Path;
-					context.AddItem(
-						new GUIContent(typeName),
-						false,
-						new InstanceClassSRAction(
-								property,
-								_array,
-								_srAttribute,
-								types[i].Path)
-							.Apply);
-				}
+				Debug.LogError("Incorrect types");
+				return;
 			}
 
-			context.ShowAsContext();
+			var typeTreeFactory = _cash.GetTypeTreeFactory(types);
+			var srActionFactory = new SRActionFactory(
+				property,
+				_array,
+				_srAttribute);
+
+			var searchWindow = SRTypesSearchWindowProvider.MakeTypesContainer(srActionFactory, typeTreeFactory);
+			SearchWindow.Open(new SearchWindowContext(GUIUtility.GUIToScreenPoint(Event.current.mousePosition)), searchWindow);
 		}
 
 		private static SerializedProperty GetParentArray(SerializedProperty element, out int index)
