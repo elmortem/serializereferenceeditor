@@ -8,45 +8,46 @@ using UnityEngine;
 
 namespace SerializeReferenceEditor.Editor.Drawers
 {
-    public class SRTypeTreeFactory
-    {
-        private readonly string[] _sortedTypePath;
+	public class SRTypeTreeFactory
+	{
+		private readonly string[] _sortedTypePath;
+		private readonly NameService _nameService = new();
 
-        public SRTypeTreeFactory(SRAttribute.TypeInfo[] types)
-        {
-            Array.Sort(types, new TypeInfoComparer());
-            _sortedTypePath = types.Select(info => info.Path).ToArray();
-        }
+		public SRTypeTreeFactory(SRAttribute.TypeInfo[] types)
+		{
+			Array.Sort(types, new TypeInfoComparer());
+			_sortedTypePath = types.Select(info => info.Path).ToArray();
+		}
 
-        public List<SearchTreeEntry> MakeTypesTree(SRActionFactory srActionFactory)
-        {
-            List<SearchTreeEntry> list = new();
-            var groups = new List<string>();
-            foreach (var pathType in _sortedTypePath)
-            {
-                var splitPathType = pathType.Split('/');
-                var groupName = "";
-                for (int i = 0; i < splitPathType.Length - 1; i++)
-                {
-                    groupName += splitPathType[i];
-                    if (!groups.Contains(groupName))
-                    {
-                        list.Add(new SearchTreeGroupEntry(new GUIContent(splitPathType[i]), i + 1));
-                        groups.Add(groupName);
-                    }
+		public List<SearchTreeEntry> MakeTypesTree(SRActionFactory srActionFactory)
+		{
+			List<SearchTreeEntry> list = new();
+			var groups = new List<string>();
+			foreach (var pathType in _sortedTypePath)
+			{
+				var splitPathType = _nameService.GetSplitPathType(pathType);
+				var groupName = "";
+				for (int i = 0; i < splitPathType.Length - 1; i++)
+				{
+					groupName += splitPathType[i];
+					if (!groups.Contains(groupName))
+					{
+						list.Add(new SearchTreeGroupEntry(new GUIContent(splitPathType[i]), i + 1));
+						groups.Add(groupName);
+					}
 
-                    groupName += "/";
-                }
+					groupName += "/";
+				}
 
-                var type = new SearchTreeEntry(new GUIContent(splitPathType.Last()))
-                {
-                    level = splitPathType.Length,
-                    userData = srActionFactory.InstantiateBuild(pathType)
-                };
-                list.Add(type);
-            }
+				var type = new SearchTreeEntry(new GUIContent(splitPathType.Last()))
+				{
+					level = splitPathType.Length,
+					userData = srActionFactory.InstantiateBuild(pathType)
+				};
+				list.Add(type);
+			}
 
-            return list;
-        }
-    }
+			return list;
+		}
+	}
 }

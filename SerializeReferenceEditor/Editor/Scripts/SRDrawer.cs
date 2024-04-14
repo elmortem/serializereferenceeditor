@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using SerializeReferenceEditor.Editor.Drawers;
 using SerializeReferenceEditor.Editor.SRActions;
 using UnityEditor;
@@ -12,6 +10,7 @@ namespace SerializeReferenceEditor.Editor
 	[CustomPropertyDrawer(typeof(SRAttribute), false)]
 	public class SRDrawer : PropertyDrawer
 	{
+		private readonly NameService _nameService = new();
 		private static readonly SRCashTypeSearchTree _cash = new();
 		private SRAttribute _srAttribute;
 		private SerializedProperty _array;
@@ -25,7 +24,7 @@ namespace SerializeReferenceEditor.Editor
 				index = GetArrayIndex(property);
 
 			_srAttribute ??= attribute as SRAttribute;
-			var typeName = GetTypeName(property.managedReferenceFullTypename);
+			var typeName = _nameService.GetTypeName(property.managedReferenceFullTypename);
 			var typeNameContent = new GUIContent(typeName + (_array != null ? ("[" + index + "]") : ""));
 
 			float buttonWidth = 10f + GUI.skin.button.CalcSize(typeNameContent).x;
@@ -111,38 +110,6 @@ namespace SerializeReferenceEditor.Editor
 			var str = propertyPath.Substring(start + 1, propertyPath.Length - start - 2);
 			int.TryParse(str, out var index);
 			return index;
-		}
-
-		private static string GetTypeName(string typeName)
-		{
-			if(string.IsNullOrEmpty(typeName))
-				return "(empty)";
-
-			if (TypeByName(typeName)?
-				    .GetCustomAttributes(typeof(SRNameAttribute), false)
-				    .FirstOrDefault()
-			    is SRNameAttribute nameAttr)
-				return nameAttr.Name;
-		
-			var index = typeName.LastIndexOf(' ');
-			if(index >= 0)
-				return typeName.Substring(index + 1);
-
-			index = typeName.LastIndexOf('.');
-			if(index >= 0)
-				return typeName.Substring(index + 1);
-
-			return typeName;
-		}
-	
-		private static Type TypeByName(string className)
-		{
-			var splitClassName = className.Split(' ');
-			return Type.GetType(
-				string.Format(
-					"{0}, {1}",
-					splitClassName[1],
-					splitClassName[0]));
 		}
 	}
 }

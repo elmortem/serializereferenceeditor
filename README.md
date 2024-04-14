@@ -53,6 +53,8 @@ public class FloatData : AbstractData
 }
 ```
 
+You can modify the display settings for the class name without specifying an attribute by navigating to `Edit -> Project Settings -> SREditor`.
+
 ## Tools
 ### MissingTypesValidator
 You can use the built-in tool to search for lost types.
@@ -63,6 +65,7 @@ You can use the built-in tool to search for lost types.
 If necessary, you can implement your own `IAssetMissingTypeReport` for error
 reporting if you use it in CI/CD systems.
 You can also implement your own `IAssetsLoader` if the default `LoadAllScriptableObjects` is not suitable for you.
+
 
 Support Unity 2019.3 or later.
 
