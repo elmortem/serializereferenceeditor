@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using SerializeReferenceEditor.Editor.Comparers;
+using SerializeReferenceEditor.Editor.Settings;
 
 namespace SerializeReferenceEditor.Editor.Drawers
 {
