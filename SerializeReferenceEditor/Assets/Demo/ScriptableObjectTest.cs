@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace SerializeReferenceEditor.Demo
+namespace Demo
 {
 	[CreateAssetMenu(menuName = "Tools/SREditor/SRDemo/ScriptableObjectTest")]
 	public class ScriptableObjectTest : ScriptableObject

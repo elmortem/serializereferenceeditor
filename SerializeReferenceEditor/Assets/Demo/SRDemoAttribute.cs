@@ -1,6 +1,7 @@
 ﻿using System;
+using SerializeReferenceEditor;
 
-namespace SerializeReferenceEditor.Demo
+namespace Demo
 {
 	public class SRDemoAttribute : SRAttribute
 	{

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SerializeReferenceEditor.Demo
+namespace Demo
 {
 	[Serializable]
 	public abstract class AbstractData

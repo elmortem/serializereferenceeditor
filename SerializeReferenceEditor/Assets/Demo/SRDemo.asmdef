@@ -1,8 +1,8 @@
 {
     "name": "SRDemo",
-    "rootNamespace": "",
+    "rootNamespace": "Demo",
     "references": [
-        "GUID:79ad2193969254fbd829729521e3eee3"
+        "SREditor"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

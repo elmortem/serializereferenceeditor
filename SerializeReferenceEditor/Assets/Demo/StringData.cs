@@ -1,4 +1,6 @@
-﻿namespace SerializeReferenceEditor.Demo
+﻿using SerializeReferenceEditor;
+
+namespace Demo
 {
 	[SRName("Data/Simple types/String")]
 	public class StringData : AbstractData

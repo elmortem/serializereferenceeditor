@@ -7,9 +7,13 @@ Convenient property drawer for fields marked with the SerializeReference attribu
 
 ## Installation
 
-Installation as a unity module via a git link in PackageManager or direct editing of `Packages/manifest' is supported.json:
+Installation as a unity module via a git link in PackageManager:
 ```
-"com.elmortem.serializereferenceeditor": "https://github.com/elmortem/serializereferenceeditor.git",
+https://github.com/elmortem/serializereferenceeditor.git?path=SerializeReferenceEditor/Packages/SerializeReferenceEditor
+```
+Or direct editing of `Packages/manifest` is supported.json:
+```
+"com.elmortem.serializereferenceeditor": "https://github.com/elmortem/serializereferenceeditor.git?path=SerializeReferenceEditor/Packages/SerializeReferenceEditor",
 ```
 
 ## Main types
@@ -29,7 +33,7 @@ public List<AbstractData> DataList = new List<AbstractData>();
 #### Additional features
 You can override SRAttribute and implement a rule for processing instantiated objects.
 
-You can see an example in [SRDemoAttribute.cs](SerializeReferenceEditor%2FDemo%2FSRDemoAttribute.cs), where the `OnCreate` method was overriden:
+You can see an example in [SRDemoAttribute.cs](SerializeReferenceEditor%2FAssets%2FDemo%2FSRDemoAttribute.cs), where the `OnCreate` method was overriden:
 ```
 public override void OnCreate(object instance)
 {
@@ -43,7 +47,7 @@ public override void OnCreate(object instance)
 ### SRNameAttribute
 Mark classes with them if you want to customize the display name and nesting hierarchy in the search tree for a specific type.
 
-Example [FloatData.cs](SerializeReferenceEditor%2FDemo%2FFloatData.cs):
+Example [FloatData.cs](SerializeReferenceEditor%2FAssets%2FDemo%2FFloatData.cs):
 ```
 [SRName("Data/Simple types/Float")]  
 public class FloatData : AbstractData
@@ -65,6 +69,9 @@ You can use the built-in tool to search for lost types.
 If necessary, you can implement your own `IAssetMissingTypeReport` for error
 reporting if you use it in CI/CD systems.
 You can also implement your own `IAssetsLoader` if the default `LoadAllScriptableObjects` is not suitable for you.
+
+## Thanks
+[Andrey Boronnikov](https://github.com/Red-Cat-Fat)
 
 
 Support Unity 2019.3 or later.

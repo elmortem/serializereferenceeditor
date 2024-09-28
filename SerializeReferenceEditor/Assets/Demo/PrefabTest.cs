@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace SerializeReferenceEditor.Demo
+namespace Demo
 {
 	public class PrefabTest : MonoBehaviour
 	{
@@ -22,5 +22,9 @@ namespace SerializeReferenceEditor.Demo
 		public List<DataList> DataLists;
 
 		public GameObject Child3;
+		
+		[SerializeReference]
+		[SRDemo(typeof(IData))]
+		public List<IData> IterfaceDataList;
 	}
 }

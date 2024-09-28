@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SerializeReferenceEditor.Demo
+namespace Demo
 {
 	public class DataHolder : MonoBehaviour
 	{

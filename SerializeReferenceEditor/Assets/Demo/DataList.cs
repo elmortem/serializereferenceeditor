@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SerializeReferenceEditor.Demo
+namespace Demo
 {
 	[Serializable]
 	public class DataList

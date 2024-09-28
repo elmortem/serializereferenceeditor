@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using SerializeReferenceEditor;
+using UnityEngine;
 
-namespace SerializeReferenceEditor.Demo
+namespace Demo
 {
 	[SRName("Data/Simple types/Float")]
 	public class FloatData : AbstractData
