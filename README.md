@@ -7,33 +7,41 @@ Convenient property drawer for fields marked with the SerializeReference attribu
 
 ## Installation
 
-Installation as a unity module via a git link in PackageManager:
+Download asset from Unity Asset Store:
+[Serialize Reference Editor](https://assetstore.unity.com/packages/slug/297559)
+
+Or installation as a unity module via a git link in PackageManager:
 ```
-https://github.com/elmortem/serializereferenceeditor.git?path=SerializeReferenceEditor/Packages/SerializeReferenceEditor
+https://github.com/elmortem/serializereferenceeditor.git?path=SerializeReferenceEditor/Assets/SerializeReferenceEditor
 ```
+
 Or direct editing of `Packages/manifest` is supported.json:
 ```
-"com.elmortem.serializereferenceeditor": "https://github.com/elmortem/serializereferenceeditor.git?path=SerializeReferenceEditor/Packages/SerializeReferenceEditor",
+"com.elmortem.serializereferenceeditor": "https://github.com/elmortem/serializereferenceeditor.git?path=SerializeReferenceEditor/Assets/SerializeReferenceEditor",
 ```
 
 ## Main types
+
 ### SRAttribute
+
 Use it to mark the fields that you want to edit. Important note - they should also be marked with the SerializeReference attribute. You can mark the base type (including the interface) with it.
 Allows you to change an array, a list, and a single element. Displays the current field type.
 
 #### Example:
+
 ```
-[SerializeReference]
-[SR]
+[SerializeReference, SR]
 public List<AbstractData> DataList = new List<AbstractData>();
 ```
 #### Result:
-<img src="Images/Demo.gif" width="400">
+
+<img src="https://elmortem.com/github/serializereferenceeditor/Images/Demo.gif" width="400">
 
 #### Additional features
+
 You can override SRAttribute and implement a rule for processing instantiated objects.
 
-You can see an example in [SRDemoAttribute.cs](SerializeReferenceEditor%2FAssets%2FDemo%2FSRDemoAttribute.cs), where the `OnCreate` method was overriden:
+You can see an example in [SRDemoAttribute.cs](https://github.com/elmortem/serializereferenceeditor/tree/master/SerializeReferenceEditor/Assets/Demo/SRDemoAttribute.cs), where the `OnCreate` method was overriden:
 ```
 public override void OnCreate(object instance)
 {
@@ -45,9 +53,10 @@ public override void OnCreate(object instance)
 ```
 
 ### SRNameAttribute
+
 Mark classes with them if you want to customize the display name and nesting hierarchy in the search tree for a specific type.
 
-Example [FloatData.cs](SerializeReferenceEditor%2FAssets%2FDemo%2FFloatData.cs):
+Example [FloatData.cs](https://github.com/elmortem/serializereferenceeditor/tree/master/SerializeReferenceEditor/Assets/Demo/FloatData.cs):
 ```
 [SRName("Data/Simple types/Float")]  
 public class FloatData : AbstractData
@@ -60,7 +69,9 @@ public class FloatData : AbstractData
 You can modify the display settings for the class name without specifying an attribute by navigating to `Edit -> Project Settings -> SREditor`.
 
 ## Tools
+
 ### MissingTypesValidator
+
 You can use the built-in tool to search for lost types.
 (this error occurs if the serialized data stores information about a type that no longer exists and could have been deleted during development). To start, you can run
 `Tools -> SREditor -> Check MissingTypes`
@@ -71,7 +82,11 @@ reporting if you use it in CI/CD systems.
 You can also implement your own `IAssetsLoader` if the default `LoadAllScriptableObjects` is not suitable for you.
 
 ## Thanks
+
 [Andrey Boronnikov](https://github.com/Red-Cat-Fat)
+
+[https://www.markdowntopdf.com](https://www.markdowntopdf.com)
+
 
 
 Support Unity 2019.3 or later.

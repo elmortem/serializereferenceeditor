@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "com.elmortem.serializereferenceeditor": {
-      "version": "file:SerializeReferenceEditor",
+    "com.unity.asset-store-tools": {
+      "version": "file:com.unity.asset-store-tools",
       "depth": 0,
       "source": "embedded",
       "dependencies": {}

@@ -30,8 +30,6 @@ namespace SerializeReferenceEditor.Editor
 			float buttonWidth = 10f + GUI.skin.button.CalcSize(typeNameContent).x;
 			float buttonHeight = EditorGUI.GetPropertyHeight(property, label, false);
 
-			EditorGUI.BeginChangeCheck();
-
 			var bgColor = GUI.backgroundColor;
 			GUI.backgroundColor = Color.green;
 			var buttonRect = new Rect(position.x + position.width - buttonWidth, position.y, buttonWidth, buttonHeight);
