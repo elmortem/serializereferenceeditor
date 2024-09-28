@@ -12,12 +12,12 @@ Download asset from Unity Asset Store:
 
 Or installation as a unity module via a git link in PackageManager:
 ```
-https://github.com/elmortem/serializereferenceeditor.git?path=SerializeReferenceEditor/Assets/SerializeReferenceEditor
+https://github.com/elmortem/serializereferenceeditor.git?path=SerializeReferenceEditor/Assets/SREditor/Package
 ```
 
 Or direct editing of `Packages/manifest` is supported.json:
 ```
-"com.elmortem.serializereferenceeditor": "https://github.com/elmortem/serializereferenceeditor.git?path=SerializeReferenceEditor/Assets/SerializeReferenceEditor",
+"com.elmortem.serializereferenceeditor": "https://github.com/elmortem/serializereferenceeditor.git?path=SerializeReferenceEditor/Assets/SREditor/Package",
 ```
 
 ## Main types
