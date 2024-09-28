@@ -1,6 +1,6 @@
 {
     "name": "SREditor-Editor",
-    "rootNamespace": "",
+    "rootNamespace": "SerializeReferenceEditor.Editor ",
     "references": [
         "SREditor"
     ],

@@ -89,7 +89,7 @@ You can also implement your own `IAssetsLoader` if the default `LoadAllScriptabl
 
 
 
-Support Unity 2019.3 or later.
+Support Unity 2021.2 or later.
 
 Use for free.
 

@@ -21,17 +21,17 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 8191843295340527619
-      type: {class: FloatData, ns: SerializeReferenceEditor.Demo, asm: SRDemo}
+      type: {class: FloatData, ns: Demo, asm: SRDemo}
       data:
         DataName: FloatData
         Float: 0
     - rid: 8191843295340527620
-      type: {class: IntegerData, ns: SerializeReferenceEditor.Demo, asm: SRDemo}
+      type: {class: IntegerData, ns: Demo, asm: SRDemo}
       data:
         DataName: IntegerData
         Int: 0
     - rid: 8191843295340527621
-      type: {class: StringData, ns: SerializeReferenceEditor.Demo, asm: SRDemo}
+      type: {class: StringData, ns: Demo, asm: SRDemo}
       data:
         DataName: StringData
         Str: 

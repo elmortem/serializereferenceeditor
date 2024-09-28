@@ -6,10 +6,10 @@ using UnityEngine;
 
 namespace SerializeReferenceEditor
 {
-	[AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
+	[AttributeUsage(AttributeTargets.Field)]
 	public class SRAttribute : PropertyAttribute
 	{
-		private static readonly Dictionary<Type, Type[]> TypeCache = new();
+		private static readonly Dictionary<Type, Type[]> _typeCache = new();
 
 		public class TypeInfo
 		{
@@ -93,7 +93,7 @@ namespace SerializeReferenceEditor
 
 		private static Type[] GetChildTypes(Type type)
 		{
-			if(TypeCache.TryGetValue(type, out var result))
+			if(_typeCache.TryGetValue(type, out var result))
 				return result;
 
 			if (type.IsInterface)
@@ -102,8 +102,7 @@ namespace SerializeReferenceEditor
 			else
 				result = Assembly.GetAssembly(type).GetTypes().Where(t => t.IsSubclassOf(type)).ToArray();
 
-			if(result != null)
-				TypeCache[type] = result;
+			_typeCache[type] = result;
 
 			return result;
 		}

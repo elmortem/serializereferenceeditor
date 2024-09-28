@@ -6,10 +6,7 @@ namespace SerializeReferenceEditor.Editor
 {
 	public class NameService
 	{
-		private readonly SREditorSettings _settings;
-
-		public NameService() 
-			=> _settings = SREditorSettings.GetOrCreateSettings();
+		private readonly SREditorSettings _settings = SREditorSettings.GetOrCreateSettings();
 
 		public string GetTypeName(string typeName) 
 			=> GetTypeName(typeName, _settings.ShowNameType);
@@ -37,9 +34,9 @@ namespace SerializeReferenceEditor.Editor
 		private static string GetOnlyCurrentType(string typeName)
 		{
 			var nameSpace = GetOnlyNameSpace(typeName);
-			var index = typeName.LastIndexOf('.');
+			var index = nameSpace.LastIndexOf('.');
 			if(index >= 0)
-				return typeName.Substring(index + 1);
+				return nameSpace.Substring(index + 1);
 			return typeName;
 		}
 

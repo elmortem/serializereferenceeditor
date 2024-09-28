@@ -12,14 +12,17 @@ namespace SerializeReferenceEditor.Editor.Settings
 		private const string SettingsPath = "ProjectSettings/SREditorSettings.json";
 		private static SREditorSettings _instance;
 
-		[SerializeField] private ShowNameType _showNameType = ShowNameType.OnlyCurrentType;
-		[SerializeField] private char[] _nameSeparators = { '/', '.' };
+		[SerializeField]
+		private ShowNameType _showNameType = ShowNameType.OnlyCurrentType;
+		[SerializeField]
+		private char[] _nameSeparators = { '/', '.' };
 		public ShowNameType ShowNameType => _showNameType;
 		public char[] NameSeparators => _nameSeparators;
 
 		public static SREditorSettings GetOrCreateSettings()
 		{
-			if (_instance != null) return _instance;
+			if (_instance != null) 
+				return _instance;
 
 			_instance = CreateInstance<SREditorSettings>();
 			if (File.Exists(SettingsPath))
