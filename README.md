@@ -29,7 +29,7 @@ Allows you to change an array, a list, and a single element. Displays the curren
 
 #### Example:
 
-```
+```C#
 [SerializeReference, SR]
 public List<AbstractData> DataList = new List<AbstractData>();
 ```
@@ -42,7 +42,7 @@ public List<AbstractData> DataList = new List<AbstractData>();
 You can override SRAttribute and implement a rule for processing instantiated objects.
 
 You can see an example in [SRDemoAttribute.cs](https://github.com/elmortem/serializereferenceeditor/tree/master/SerializeReferenceEditor/Assets/Demo/SRDemoAttribute.cs), where the `OnCreate` method was overriden:
-```
+```C#
 public override void OnCreate(object instance)
 {
     if(instance is AbstractData)
@@ -57,7 +57,7 @@ public override void OnCreate(object instance)
 Mark classes with them if you want to customize the display name and nesting hierarchy in the search tree for a specific type.
 
 Example [FloatData.cs](https://github.com/elmortem/serializereferenceeditor/tree/master/SerializeReferenceEditor/Assets/Demo/FloatData.cs):
-```
+```C#
 [SRName("Data/Simple types/Float")]  
 public class FloatData : AbstractData
 {
