@@ -259,7 +259,6 @@ MonoBehaviour:
     - rid: 2283897410765455361
       type: {class: IntegerData, ns: Demo, asm: SRDemo}
       data:
-        DataName: IntegerData
         Int: 0
 --- !u!4 &1173839736
 Transform:
@@ -368,6 +367,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 146599816147254134, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: ComplexData
+      value: 5001890952956346369
+      objectReference: {fileID: 0}
+    - target: {fileID: 146599816147254134, guid: 2cfca8517d037415ba308930afe49802, type: 3}
       propertyPath: IterfaceDataList.Array.data[0]
       value: 2283897410765455360
       objectReference: {fileID: 0}
@@ -376,7 +379,55 @@ PrefabInstance:
       value: SRDemo Demo.StringInterfaceData
       objectReference: {fileID: 0}
     - target: {fileID: 146599816147254134, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: managedReferences[5001890952956346368]
+      value: SRDemo Demo.IntegerNamedData
+      objectReference: {fileID: 0}
+    - target: {fileID: 146599816147254134, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: managedReferences[5001890952956346369]
+      value: SRDemo Demo.ComplexData
+      objectReference: {fileID: 0}
+    - target: {fileID: 146599816147254134, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: managedReferences[5001890952956346370]
+      value: SRDemo Demo.FloatNamedData
+      objectReference: {fileID: 0}
+    - target: {fileID: 146599816147254134, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: managedReferences[5001890952956346371]
+      value: SRDemo Demo.FloatNamedData
+      objectReference: {fileID: 0}
+    - target: {fileID: 146599816147254134, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: managedReferences[5001890952956346368].Int
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 146599816147254134, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: managedReferences[5001890952956346369].Data
+      value: 5001890952956346371
+      objectReference: {fileID: 0}
+    - target: {fileID: 146599816147254134, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: managedReferences[5001890952956346369].Demo
+      value: 5001890952956346370
+      objectReference: {fileID: 0}
+    - target: {fileID: 146599816147254134, guid: 2cfca8517d037415ba308930afe49802, type: 3}
       propertyPath: managedReferences[2283897410765455360].Value
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 146599816147254134, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: managedReferences[5001890952956346370].Float
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 146599816147254134, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: managedReferences[5001890952956346371].Float
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 146599816147254134, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: managedReferences[5001890952956346368].DataName
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 146599816147254134, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: managedReferences[5001890952956346370].DataName
+      value: FloatNamedData
+      objectReference: {fileID: 0}
+    - target: {fileID: 146599816147254134, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: managedReferences[5001890952956346371].DataName
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5370488343339443315, guid: 2cfca8517d037415ba308930afe49802, type: 3}

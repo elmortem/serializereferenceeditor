@@ -74,8 +74,9 @@ namespace SerializeReferenceEditor
 			TypeInfo[] result = new TypeInfo[types.Length];
 			for(int i = 0; i < types.Length; ++i)
 			{
-				var typeName = types[i].FullName;
-				var nameAttribute = types[i].GetCustomAttributes(typeof(SRNameAttribute), false)
+				var type = types[i];
+				var typeName = type.FullName;
+				var nameAttribute = type.GetCustomAttributes(typeof(SRNameAttribute), false)
 					.Select(attr=> attr as SRNameAttribute)
 					.FirstOrDefault();
 			
@@ -83,7 +84,7 @@ namespace SerializeReferenceEditor
 					typeName = nameAttribute.FullName;
 			
 				result[i] = new TypeInfo { 
-					Type = types[i], 
+					Type = type, 
 					Path = typeName 
 				};
 			}
@@ -100,7 +101,8 @@ namespace SerializeReferenceEditor
 				result = AppDomain.CurrentDomain.GetAssemblies().SelectMany(s => s.GetTypes())
 					.Where(p => p != type && type.IsAssignableFrom(p)).ToArray();
 			else
-				result = Assembly.GetAssembly(type).GetTypes().Where(t => t.IsSubclassOf(type)).ToArray();
+				result = Assembly.GetAssembly(type).GetTypes()
+					.Where(t => !t.IsAbstract && !t.IsInterface && t.IsSubclassOf(type)).ToArray();
 
 			_typeCache[type] = result;
 

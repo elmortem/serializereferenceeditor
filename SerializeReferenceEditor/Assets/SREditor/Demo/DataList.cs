@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using SerializeReferenceEditor;
 using UnityEngine;
 
 namespace Demo
@@ -10,7 +11,7 @@ namespace Demo
 		public string Title;
 
 		[SerializeReference]
-		[SRDemo(typeof(AbstractData))]
+		[SR(typeof(AbstractData))]
 		public List<AbstractData> List;
 	}
 }

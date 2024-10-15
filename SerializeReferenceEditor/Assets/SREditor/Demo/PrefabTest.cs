@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SerializeReferenceEditor;
 using UnityEngine;
 
 namespace Demo
@@ -8,7 +9,7 @@ namespace Demo
 		public string Title;
 
 		public GameObject Child1;
-
+		
 		[SerializeReference]
 		[SRDemo(typeof(AbstractData))]
 		public AbstractData SingleElement;
@@ -26,5 +27,8 @@ namespace Demo
 		[SerializeReference]
 		[SRDemo(typeof(IData))]
 		public List<IData> IterfaceDataList;
+		
+		[SerializeReference, SR]
+		public AbstractData ComplexData;
 	}
 }

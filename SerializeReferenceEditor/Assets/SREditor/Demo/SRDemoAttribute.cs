@@ -19,9 +19,9 @@ namespace Demo
 
 		public override void OnCreate(object instance)
 		{
-			if(instance is AbstractData)
+			if(instance is AbstractNamedData namedData)
 			{
-				((AbstractData)instance).DataName = instance.GetType().Name;
+				namedData.DataName = instance.GetType().Name;
 			}
 		}
 	}

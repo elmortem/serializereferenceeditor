@@ -2,7 +2,7 @@
   "displayName": "Serialize Reference Editor",
   "name": "com.elmortem.serializereferenceeditor",
   "author": "Makar Osokin",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "unity": "2021.3",
   "description": "Custom serialize reference Unity editor",
   "keywords": [

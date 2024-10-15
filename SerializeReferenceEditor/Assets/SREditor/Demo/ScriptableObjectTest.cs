@@ -9,7 +9,7 @@ namespace Demo
 		public string Title;
 
 		[SerializeReference]
-		[SRDemo(typeof(AbstractData))]
+		[SRDemo]
 		public List<AbstractData> List;
 	}
 }
