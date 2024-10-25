@@ -92,19 +92,28 @@ namespace SerializeReferenceEditor
 			return result;
 		}
 
-		private static Type[] GetChildTypes(Type type)
+		private static bool IsCorrectChildTypeForSearchTree(Type baseType, Type childType)
 		{
-			if(_typeCache.TryGetValue(type, out var result))
+			return !childType.IsAbstract
+			       && !childType.IsInterface
+			       && childType != baseType
+			       && (baseType.IsInterface
+				       ? baseType.IsAssignableFrom(childType)
+				       : childType.IsSubclassOf(baseType));
+		}
+
+		private static Type[] GetChildTypes(Type baseType)
+		{
+			if (_typeCache.TryGetValue(baseType, out var result))
 				return result;
 
-			if (type.IsInterface)
-				result = AppDomain.CurrentDomain.GetAssemblies().SelectMany(s => s.GetTypes())
-					.Where(p => p != type && type.IsAssignableFrom(p)).ToArray();
-			else
-				result = Assembly.GetAssembly(type).GetTypes()
-					.Where(t => !t.IsAbstract && !t.IsInterface && t.IsSubclassOf(type)).ToArray();
+			result = AppDomain.CurrentDomain
+				.GetAssemblies()
+				.SelectMany(s => s.GetTypes())
+				.Where(childType => IsCorrectChildTypeForSearchTree(baseType, childType))
+				.ToArray();
 
-			_typeCache[type] = result;
+			_typeCache[baseType] = result;
 
 			return result;
 		}
