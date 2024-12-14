@@ -20,15 +20,24 @@ namespace SerializeReferenceEditor
 			var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 			foreach (var assembly in assemblies)
 			{
-				CollectTypeReplacementsForAssembly(assembly.Location);
+				try
+				{
+					if (assembly.IsDynamic)
+						continue;
+
+					CollectTypeReplacementsForAssembly(assembly);
+				}
+				catch
+				{
+					continue;
+				}
 			}
 		}
 
-		public static void CollectTypeReplacementsForAssembly(string assemblyPath)
+		private static void CollectTypeReplacementsForAssembly(Assembly assembly)
 		{
-			var assemblyName = System.IO.Path.GetFileNameWithoutExtension(assemblyPath);
+			var assemblyName = assembly.GetName().Name;
 			
-			// Remove old attributes from this assembly
 			var newAttributeTypes = _attributeTypes
 				.Where(kvp => kvp.Value.Assembly.GetName().Name != assemblyName)
 				.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
@@ -41,9 +50,7 @@ namespace SerializeReferenceEditor
 
 			try
 			{
-				var assembly = Assembly.LoadFrom(assemblyPath);
 				var types = assembly.GetTypes();
-
 				foreach (var type in types)
 				{
 					var attributes = type.GetCustomAttributes<FormerlySerializedTypeAttribute>();
@@ -52,6 +59,18 @@ namespace SerializeReferenceEditor
 						_attributeTypes[attr] = type;
 					}
 				}
+			}
+			catch (ReflectionTypeLoadException)
+			{
+			}
+		}
+
+		public static void CollectTypeReplacementsForAssembly(string assemblyPath)
+		{
+			try
+			{
+				var assembly = Assembly.LoadFrom(assemblyPath);
+				CollectTypeReplacementsForAssembly(assembly);
 			}
 			catch
 			{
