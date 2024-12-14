@@ -1,0 +1,17 @@
+{
+    "name": "NewTest",
+    "rootNamespace": "Demo.NewTest",
+    "references": [
+        "SREditor",
+        "SRDemo"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -30,5 +30,8 @@ namespace Demo
 		
 		[SerializeReference, SR]
 		public AbstractData ComplexData;
+
+		[SerializeReference, SR]
+		public BaseTestData TestData;
 	}
 }

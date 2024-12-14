@@ -1,0 +1,28 @@
+{
+  "displayName": "Serialize Reference Editor",
+  "name": "com.elmortem.serializereferenceeditor",
+  "author": 
+  {
+    "name": "Makar Osokin", 
+    "email": "elmortem@gmail.com", 
+    "url": "https://makar.rs"
+  },
+  "version": "1.2.7",
+  "unity": "2021.3",
+  "description": "Custom serialize reference Unity editor with support FormerlySerializedType attribute.",
+  "keywords": [
+    "serialization",
+    "serialize reference",
+	"unity",
+	"tools",
+	"utility"
+  ],
+  "category": "Editor",
+  "samples": [
+    {
+      "displayName": "SR Editor Demo",
+      "description": "Scene and all classes for SR Editor Demo",
+      "path": "Samples~/Demo"
+    }
+  ]
+}

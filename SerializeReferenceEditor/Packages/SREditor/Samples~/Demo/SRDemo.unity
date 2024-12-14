@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028373, g: 0.22571398, b: 0.30692294, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -367,6 +367,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 146599816147254134, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: TestData
+      value: 4923825590164520960
+      objectReference: {fileID: 0}
+    - target: {fileID: 146599816147254134, guid: 2cfca8517d037415ba308930afe49802, type: 3}
       propertyPath: ComplexData
       value: 5001890952956346369
       objectReference: {fileID: 0}
@@ -377,6 +381,10 @@ PrefabInstance:
     - target: {fileID: 146599816147254134, guid: 2cfca8517d037415ba308930afe49802, type: 3}
       propertyPath: managedReferences[2283897410765455360]
       value: SRDemo Demo.StringInterfaceData
+      objectReference: {fileID: 0}
+    - target: {fileID: 146599816147254134, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: managedReferences[4923825590164520960]
+      value: NewTest Demo.NewTests.NewTestData
       objectReference: {fileID: 0}
     - target: {fileID: 146599816147254134, guid: 2cfca8517d037415ba308930afe49802, type: 3}
       propertyPath: managedReferences[5001890952956346368]
@@ -409,6 +417,10 @@ PrefabInstance:
     - target: {fileID: 146599816147254134, guid: 2cfca8517d037415ba308930afe49802, type: 3}
       propertyPath: managedReferences[2283897410765455360].Value
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 146599816147254134, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: managedReferences[4923825590164520960].Value
+      value: 111
       objectReference: {fileID: 0}
     - target: {fileID: 146599816147254134, guid: 2cfca8517d037415ba308930afe49802, type: 3}
       propertyPath: managedReferences[5001890952956346370].Float
@@ -444,7 +456,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6544989126436113910, guid: 2cfca8517d037415ba308930afe49802, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6544989126436113910, guid: 2cfca8517d037415ba308930afe49802, type: 3}
       propertyPath: m_LocalPosition.y

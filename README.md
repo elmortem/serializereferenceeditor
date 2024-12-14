@@ -12,17 +12,17 @@ Download asset from Unity Asset Store:
 
 Or installation as a unity module via a git link in PackageManager:
 ```
-https://github.com/elmortem/serializereferenceeditor.git?path=SerializeReferenceEditor/Assets/SREditor/Package
+https://github.com/elmortem/serializereferenceeditor.git?path=SerializeReferenceEditor/Packages/SREditor
 ```
 
 Or direct editing of `Packages/manifest` is supported.json:
 ```
-"com.elmortem.serializereferenceeditor": "https://github.com/elmortem/serializereferenceeditor.git?path=SerializeReferenceEditor/Assets/SREditor/Package",
+"com.elmortem.serializereferenceeditor": "https://github.com/elmortem/serializereferenceeditor.git?path=SerializeReferenceEditor/Packages/SREditor",
 ```
 
 ## Main types
 
-### SRAttribute
+### SR attribute
 
 Use it to mark the fields that you want to edit. Important note - they should also be marked with the SerializeReference attribute. You can mark the base type (including the interface) with it.
 Allows you to change an array, a list, and a single element. Displays the current field type.
@@ -41,7 +41,7 @@ public List<AbstractData> DataList = new List<AbstractData>();
 
 You can override SRAttribute and implement a rule for processing instantiated objects.
 
-You can see an example in [SRDemoAttribute.cs](https://github.com/elmortem/serializereferenceeditor/tree/master/SerializeReferenceEditor/Assets/Demo/SRDemoAttribute.cs), where the `OnCreate` method was overriden:
+You can see an example in [SRDemoAttribute.cs](https://github.com/elmortem/serializereferenceeditor/tree/master/SerializeReferenceEditor/Packages/SREditor/Samples~/Demo/SRDemoAttribute.cs), where the `OnCreate` method was overriden:
 ```csharp
 public override void OnCreate(object instance)
 {
@@ -52,11 +52,11 @@ public override void OnCreate(object instance)
 }
 ```
 
-### SRNameAttribute
+### SRName attribute
 
 Mark classes with them if you want to customize the display name and nesting hierarchy in the search tree for a specific type.
 
-Example [FloatData.cs](https://github.com/elmortem/serializereferenceeditor/tree/master/SerializeReferenceEditor/Assets/Demo/FloatData.cs):
+Example [FloatData.cs](https://github.com/elmortem/serializereferenceeditor/tree/master/SerializeReferenceEditor/Packages/SREditor/Samples~/Demo/Datas/FloatData.cs):
 ```csharp
 [SRName("Data/Simple types/Float")]  
 public class FloatData : AbstractData
@@ -70,7 +70,7 @@ You can modify the display settings for the class name without specifying an att
 
 ## Tools
 
-### MissingTypesValidator
+### Missing Types Validator
 
 You can use the built-in tool to search for lost types.
 (this error occurs if the serialized data stores information about a type that no longer exists and could have been deleted during development). To start, you can run
@@ -80,6 +80,20 @@ You can use the built-in tool to search for lost types.
 If necessary, you can implement your own `IAssetMissingTypeReport` for error
 reporting if you use it in CI/CD systems.
 You can also implement your own `IAssetsLoader` if the default `LoadAllScriptableObjects` is not suitable for you.
+
+### Class Replacer
+
+Use `Tools -> SREditor -> Class Replacer` for replace Serialize Reference classes.
+
+### FormerlySerializedType attribute
+
+It is analogue of attribute FormerlySerializedAs, but works for Serialize Reference classes.
+Example [NewTestData.cs](https://github.com/elmortem/serializereferenceeditor/tree/master/SerializeReferenceEditor/Packages/SREditor/Samples~/Demo/NewTests/NewTestData.cs):
+```csharp
+[Serializable, SRName("New Test")]
+[FormerlySerializedType("SRDemo, Demo.OldTestData")]
+public class NewTestData : BaseTestData
+```
 
 ## Thanks
 
