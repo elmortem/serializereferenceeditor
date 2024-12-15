@@ -16,8 +16,27 @@ namespace SerializeReferenceEditor.Editor.Settings
 		private ShowNameType _showNameType = ShowNameType.OnlyCurrentType;
 		[SerializeField]
 		private char[] _nameSeparators = { '/', '.' };
+		[SerializeField]
+		private bool _formerlySerializedTypeOnSceneSave = true;
+		[SerializeField]
+		private bool _formerlySerializedTypeOnAssetSelect = true;
+		[SerializeField]
+		private bool _formerlySerializedTypeOnAssetImport = true;
+		[SerializeField]
+		private bool _doubleCleanOnEditorUpdate = true;
+		[SerializeField]
+		private bool _doubleCleanOnUndoRedo = true;
+		[SerializeField]
+		private bool _doubleCleanOnAssetSave = true;
+		
 		public ShowNameType ShowNameType => _showNameType;
 		public char[] NameSeparators => _nameSeparators;
+		public bool FormerlySerializedTypeOnSceneSave => _formerlySerializedTypeOnSceneSave;
+		public bool FormerlySerializedTypeOnAssetSelect => _formerlySerializedTypeOnAssetSelect;
+		public bool FormerlySerializedTypeOnAssetImport => _formerlySerializedTypeOnAssetImport;
+		public bool DoubleCleanOnEditorUpdate => _doubleCleanOnEditorUpdate;
+		public bool DoubleCleanOnUndoRedo => _doubleCleanOnUndoRedo;
+		public bool DoubleCleanOnAssetSave => _doubleCleanOnAssetSave;
 
 		public static SREditorSettings GetOrCreateSettings()
 		{

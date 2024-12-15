@@ -99,6 +99,9 @@ MonoBehaviour:
     rid: -2
   TestData:
     rid: 4923825590164520967
+  Containers:
+  - Data:
+      rid: 3495374205272457216
   references:
     version: 2
     RefIds:
@@ -112,6 +115,10 @@ MonoBehaviour:
       type: {class: StringInterfaceData, ns: Demo, asm: SRDemo}
       data:
         Value: Test
+    - rid: 3495374205272457216
+      type: {class: IntegerData, ns: Demo, asm: SRDemo}
+      data:
+        Int: 999
     - rid: 4923825590164520967
       type: {class: NewTestData, ns: Demo.NewTests, asm: NewTest}
       data:

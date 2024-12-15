@@ -7,9 +7,9 @@
     "email": "elmortem@gmail.com", 
     "url": "https://makar.rs"
   },
-  "version": "1.2.10",
+  "version": "1.2.11",
   "unity": "2021.3",
-  "description": "Custom serialize reference Unity editor with support FormerlySerializedType attribute.",
+  "description": "Unity SerializeReference editor with FormerlySerializedType attribute support for tracking renamed SerializeReference classes during refactoring and duplicate SerializeReference instance cleaning.",
   "keywords": [
     "serialization",
     "serialize reference",

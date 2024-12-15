@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SerializeReferenceEditor;
 using UnityEngine;
 
@@ -33,5 +34,7 @@ namespace Demo
 
 		[SerializeReference, SR]
 		public BaseTestData TestData;
+		
+		public ContainerData[] Containers = Array.Empty<ContainerData>();
 	}
 }

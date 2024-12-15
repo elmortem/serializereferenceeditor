@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using SerializeReferenceEditor.Editor.Settings;
 using UnityEditor;
 using UnityEngine;
 using UnityEditor.SceneManagement;
@@ -23,9 +24,48 @@ namespace SerializeReferenceEditor.Editor.ClassReplacer
 
 			OnSelectionChanged();
 		}
-
+		
+		private static void OnPostprocessAllAssets(
+			string[] importedAssets,
+			string[] deletedAssets,
+			string[] movedAssets,
+			string[] movedFromAssetPaths)
+		{
+			if (!SREditorSettings.GetOrCreateSettings()?.FormerlySerializedTypeOnAssetImport??false)
+				return;
+			
+			foreach (var assetPath in importedAssets)
+			{
+				var asset = AssetDatabase.LoadAssetAtPath<Object>(assetPath);
+				if (asset != null)
+				{
+					ProcessObject(asset);
+				}
+			}
+		}
+		
+		private static void OnSceneSaving(UnityEngine.SceneManagement.Scene scene, string path)
+		{
+			if (!SREditorSettings.GetOrCreateSettings()?.FormerlySerializedTypeOnSceneSave??false)
+				return;
+			
+			foreach (var rootObj in scene.GetRootGameObjects())
+			{
+				foreach (var component in rootObj.GetComponentsInChildren<Component>(true))
+				{
+					if (component != null)
+					{
+						ProcessObject(component);
+					}
+				}
+			}
+		}
+		
 		private static void OnSelectionChanged()
 		{
+			if (!SREditorSettings.GetOrCreateSettings()?.FormerlySerializedTypeOnAssetSelect??false)
+				return;
+			
 			if (Selection.objects != null && Selection.objects.Length > 0)
 			{
 				foreach (var obj in Selection.objects)
@@ -67,36 +107,6 @@ namespace SerializeReferenceEditor.Editor.ClassReplacer
 			{
 				AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceUpdate);
 				EditorUtility.SetDirty(obj);
-			}
-		}
-
-		private static void OnSceneSaving(UnityEngine.SceneManagement.Scene scene, string path)
-		{
-			foreach (var rootObj in scene.GetRootGameObjects())
-			{
-				foreach (var component in rootObj.GetComponentsInChildren<Component>(true))
-				{
-					if (component != null)
-					{
-						ProcessObject(component);
-					}
-				}
-			}
-		}
-
-		private static void OnPostprocessAllAssets(
-			string[] importedAssets,
-			string[] deletedAssets,
-			string[] movedAssets,
-			string[] movedFromAssetPaths)
-		{
-			foreach (var assetPath in importedAssets)
-			{
-				var asset = AssetDatabase.LoadAssetAtPath<Object>(assetPath);
-				if (asset != null)
-				{
-					ProcessObject(asset);
-				}
 			}
 		}
 	}
