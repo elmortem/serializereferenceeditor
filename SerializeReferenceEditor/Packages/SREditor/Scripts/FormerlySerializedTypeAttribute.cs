@@ -80,6 +80,10 @@ namespace SerializeReferenceEditor
                 _isInitialized = true;
             }
         }
+#else
+        public FormerlySerializedTypeAttribute(string oldTypeFullName)
+        {
+        }
 #endif
     }
 }
