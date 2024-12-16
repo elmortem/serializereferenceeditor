@@ -37,7 +37,7 @@ public List<AbstractData> DataList = new List<AbstractData>();
 ```
 #### Result:
 
-<img src="https://elmortem.com/github/serializereferenceeditor/Images/Demo.gif" width="400">
+<img src="Images/Demo.gif" width="400">
 
 #### Additional features
 
