@@ -1,5 +1,6 @@
 using System.IO;
 using System.Linq;
+using UnityEditor;
 
 namespace SerializeReferenceEditor.Editor.ClassReplacer
 {
@@ -7,6 +8,9 @@ namespace SerializeReferenceEditor.Editor.ClassReplacer
     {
         public static bool ReplaceTypeInFile(string path, string oldTypePattern, string newTypePattern)
         {
+            if (AssetDatabase.IsValidFolder(path))
+                return false;
+            
             string content = File.ReadAllText(path);
             bool wasModified = false;
 
