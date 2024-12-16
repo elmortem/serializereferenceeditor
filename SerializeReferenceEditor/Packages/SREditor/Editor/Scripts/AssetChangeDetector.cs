@@ -1,28 +1,31 @@
 using System;
 using System.Collections.Generic;
-using SerializeReferenceEditor.Editor.Settings;
 using UnityEditor;
 using Object = UnityEngine.Object;
 
-namespace SerializeReferenceEditor.Editor.DoubleCleaner
+namespace SerializeReferenceEditor.Editor
 {
 	public class AssetChangeDetector : AssetModificationProcessor
 	{
-		private static HashSet<Object> _changedAssets = new();
+		private static bool _onAssetSave;
+		private static readonly HashSet<Object> _changedAssets = new();
 		public static event Action<Object> ChangeEvent;
-
-		[InitializeOnLoadMethod]
-		static void Initialize()
+		
+		public static void Initialize(bool onEditorUpdate, bool onUndoRedo, bool onAssetSave)
 		{
-			EditorApplication.update += OnEditorUpdate;
-			Undo.postprocessModifications += OnUndoRedoPerformed;
+			EditorApplication.update -= OnEditorUpdate;
+			if (onEditorUpdate)
+				EditorApplication.update += OnEditorUpdate;
+			
+			Undo.postprocessModifications -= OnUndoRedoPerformed;
+			if (onUndoRedo)
+				Undo.postprocessModifications += OnUndoRedoPerformed;
+			
+			_onAssetSave = onAssetSave;
 		}
 
 		private static void OnEditorUpdate()
 		{
-			if (!SREditorSettings.GetOrCreateSettings()?.DoubleCleanOnEditorUpdate??false)
-				return;
-
 			if (EditorApplication.isPlaying || EditorApplication.isPaused)
 				return;
 
@@ -45,9 +48,6 @@ namespace SerializeReferenceEditor.Editor.DoubleCleaner
 
 		private static UndoPropertyModification[] OnUndoRedoPerformed(UndoPropertyModification[] modifications)
 		{
-			if (!SREditorSettings.GetOrCreateSettings()?.DoubleCleanOnUndoRedo??false)
-				return modifications;
-			
 			if (modifications == null || modifications.Length == 0)
 				return modifications;
 
@@ -66,7 +66,7 @@ namespace SerializeReferenceEditor.Editor.DoubleCleaner
 
 		public static string[] OnWillSaveAssets(string[] paths)
 		{
-			if (!SREditorSettings.GetOrCreateSettings()?.DoubleCleanOnAssetSave??false)
+			if (!_onAssetSave)
 				return paths;
 			
 			foreach (var path in paths)

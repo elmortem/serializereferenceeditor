@@ -1,14 +1,16 @@
-# Unity SerializeReference Property Drawer
+# Serialize Reference Editor for Unity
 
 [![color:ff69b4](https://img.shields.io/badge/licence-Unlicense-blue)](https://unlicense.org)
 ![color:ff69b4](https://img.shields.io/badge/Unity-2019.3.x-red)
 
-Convenient property drawer for fields marked with the SerializeReference attribute.
+A powerful Unity editor extension that provides complete control over **SerializeReference** fields with smart type management, validation tools, and data integrity features.
 
 ## Installation
 
 Download asset from Unity Asset Store:
 [Serialize Reference Editor](https://assetstore.unity.com/packages/slug/297559)
+
+**Please, remove old version Serialize Reference Editor for Unity before update!**
 
 Or installation as a unity module via a git link in PackageManager:
 ```
@@ -94,6 +96,10 @@ Example [NewTestData.cs](https://github.com/elmortem/serializereferenceeditor/tr
 [FormerlySerializedType("SRDemo, Demo.OldTestData")]
 public class NewTestData : BaseTestData
 ```
+
+### Duplicate Cleaner
+
+Now Serialize Reference Editor can auto detect and handle SerializeReference object duplicates with flexible settings - you can nullify them, create them with default values, or make deep copies, preventing issues with unwanted reference sharing in your assets.
 
 ## Thanks
 

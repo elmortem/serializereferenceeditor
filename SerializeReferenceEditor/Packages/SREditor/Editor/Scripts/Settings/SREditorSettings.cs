@@ -13,21 +13,23 @@ namespace SerializeReferenceEditor.Editor.Settings
 		private static SREditorSettings _instance;
 
 		[SerializeField]
-		private ShowNameType _showNameType = ShowNameType.OnlyCurrentType;
+		internal ShowNameType _showNameType = ShowNameType.OnlyCurrentType;
 		[SerializeField]
-		private char[] _nameSeparators = { '/', '.' };
+		internal char[] _nameSeparators = { '/', '.' };
 		[SerializeField]
-		private bool _formerlySerializedTypeOnSceneSave = true;
+		internal bool _formerlySerializedTypeOnSceneSave = true;
 		[SerializeField]
-		private bool _formerlySerializedTypeOnAssetSelect = true;
+		internal bool _formerlySerializedTypeOnAssetSelect = true;
 		[SerializeField]
-		private bool _formerlySerializedTypeOnAssetImport = true;
+		internal bool _formerlySerializedTypeOnAssetImport = true;
 		[SerializeField]
-		private bool _doubleCleanOnEditorUpdate = true;
+		internal bool _doubleCleanOnEditorUpdate = true;
 		[SerializeField]
-		private bool _doubleCleanOnUndoRedo = true;
+		internal bool _doubleCleanOnUndoRedo = true;
 		[SerializeField]
-		private bool _doubleCleanOnAssetSave = true;
+		internal bool _doubleCleanOnAssetSave = true;
+		[SerializeField]
+		internal SRDuplicateMode _duplicateMode = SRDuplicateMode.Default;
 		
 		public ShowNameType ShowNameType => _showNameType;
 		public char[] NameSeparators => _nameSeparators;
@@ -37,6 +39,15 @@ namespace SerializeReferenceEditor.Editor.Settings
 		public bool DoubleCleanOnEditorUpdate => _doubleCleanOnEditorUpdate;
 		public bool DoubleCleanOnUndoRedo => _doubleCleanOnUndoRedo;
 		public bool DoubleCleanOnAssetSave => _doubleCleanOnAssetSave;
+		public SRDuplicateMode DuplicateMode => _duplicateMode;
+		
+		[InitializeOnLoadMethod]
+		static void Initialize()
+		{
+			var settings = GetOrCreateSettings();
+			AssetChangeDetector.Initialize(settings.DoubleCleanOnEditorUpdate, settings.DoubleCleanOnUndoRedo,
+				settings.DoubleCleanOnAssetSave);
+		}
 
 		public static SREditorSettings GetOrCreateSettings()
 		{
@@ -52,8 +63,11 @@ namespace SerializeReferenceEditor.Editor.Settings
 			return _instance;
 		}
 
-		public static void SaveSettings() 
-			=> File.WriteAllText(SettingsPath, JsonUtility.ToJson(_instance, true));
+		public static void SaveSettings()
+		{
+			File.WriteAllText(SettingsPath, JsonUtility.ToJson(_instance, true));
+			Initialize();
+		}
 
 		[SettingsProvider]
 		internal static SettingsProvider CreateSettingsProvider() 

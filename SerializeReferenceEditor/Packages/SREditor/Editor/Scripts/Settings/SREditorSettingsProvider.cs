@@ -20,29 +20,33 @@ namespace SerializeReferenceEditor.Editor.Settings
 		private void OnGuiHandler(string _)
 		{
 			var settings = new SerializedObject(SREditorSettings.GetOrCreateSettings());
-			//using (new EditorGUILayout.HorizontalScope())
+			using (new EditorGUILayout.HorizontalScope())
 			{
 				GUILayout.Space(10f);
 				using (new EditorGUILayout.VerticalScope())
 				{
 					using (var changeCheck = new EditorGUI.ChangeCheckScope())
 					{
-						EditorGUILayout.PropertyField(settings.FindProperty("_showNameType"));
-						EditorGUILayout.PropertyField(settings.FindProperty("_nameSeparators"));
+						EditorGUILayout.PropertyField(settings.FindProperty(nameof(SREditorSettings._showNameType)));
+						EditorGUILayout.PropertyField(settings.FindProperty(nameof(SREditorSettings._nameSeparators)));
 						
 						EditorGUILayout.Space();
 						EditorGUILayout.LabelField("Formerly Serialized Type", EditorStyles.boldLabel);
 
-						DrawCheckbox(settings, "_formerlySerializedTypeOnSceneSave");
-						DrawCheckbox(settings, "_formerlySerializedTypeOnAssetSelect");
-						DrawCheckbox(settings, "_formerlySerializedTypeOnAssetImport");
+						DrawCheckbox(settings, nameof(SREditorSettings._formerlySerializedTypeOnSceneSave));
+						DrawCheckbox(settings, nameof(SREditorSettings._formerlySerializedTypeOnAssetSelect));
+						DrawCheckbox(settings, nameof(SREditorSettings._formerlySerializedTypeOnAssetImport));
 						
 						EditorGUILayout.Space();
 						EditorGUILayout.LabelField("Double Clean", EditorStyles.boldLabel);
 						
-						DrawCheckbox(settings, "_doubleCleanOnEditorUpdate");
-						DrawCheckbox(settings, "_doubleCleanOnUndoRedo");
-						DrawCheckbox(settings, "_doubleCleanOnAssetSave");
+						DrawCheckbox(settings, nameof(SREditorSettings._doubleCleanOnEditorUpdate));
+						DrawCheckbox(settings, nameof(SREditorSettings._doubleCleanOnUndoRedo));
+						DrawCheckbox(settings, nameof(SREditorSettings._doubleCleanOnAssetSave));
+
+						EditorGUILayout.Space();
+						EditorGUILayout.LabelField("Duplicate Handling", EditorStyles.boldLabel);
+						EditorGUILayout.PropertyField(settings.FindProperty(nameof(SREditorSettings._duplicateMode)));
 
 						if (!changeCheck.changed)
 							return;
