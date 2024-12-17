@@ -105,6 +105,8 @@ Now Serialize Reference Editor can auto detect and handle SerializeReference obj
 
 [Andrey Boronnikov](https://github.com/Red-Cat-Fat)
 
+[Georg Meyer](https://github.com/scho)
+
 [https://www.markdowntopdf.com](https://www.markdowntopdf.com)
 
 
