@@ -8,7 +8,7 @@ namespace SerializeReferenceEditor.Editor.Drawers
         private readonly TypeInfoArrayComparer _typeInfoComparer = new();
         private readonly Dictionary<int, SRTypeTreeFactory> _cashTypes = new();
 
-        public SRTypeTreeFactory GetTypeTreeFactory(SRAttribute.TypeInfo[] types)
+        public SRTypeTreeFactory GetTypeTreeFactory(TypeInfo[] types)
         {
             SRTypeTreeFactory typeTreeFactory;
             var typesHash = _typeInfoComparer.GetHashCode(types);

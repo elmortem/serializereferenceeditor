@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using SerializeReferenceEditor.Editor.Settings;
+using SerializeReferenceEditor.Services;
 using UnityEditor;
 using UnityEngine;
 using UnityEditor.SceneManagement;
@@ -89,7 +90,7 @@ namespace SerializeReferenceEditor.Editor.ClassReplacer
 			}
 
 			bool modified = false;
-			foreach (var (oldAssembly, oldType, newType) in SRTypeCache.GetAllReplacements())
+			foreach (var (oldAssembly, oldType, newType) in SRFormerlyTypeCache.GetAllReplacements())
 			{
 				var oldTypePattern = string.IsNullOrEmpty(oldAssembly) ? oldType : $"{oldAssembly}, {oldType}";
 				var newAssembly = newType.Assembly.GetName().Name;

@@ -1,6 +1,6 @@
 {
     "name": "SREditor",
-    "rootNamespace": "",
+    "rootNamespace": "SerializeReferenceEditor",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

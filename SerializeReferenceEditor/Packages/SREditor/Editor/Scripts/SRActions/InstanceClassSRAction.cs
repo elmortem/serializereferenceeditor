@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -6,31 +7,29 @@ namespace SerializeReferenceEditor.Editor.SRActions
 {
     public class InstanceClassSRAction : BaseSRAction
     {
-        private readonly SRAttribute _srAttribute;
+        private readonly TypeInfo[] _typeInfos;
         private readonly string _type;
 
-        public InstanceClassSRAction(SerializedProperty currentProperty, SerializedProperty parentProperty, SRAttribute srAttribute, string type)
+        public InstanceClassSRAction(SerializedProperty currentProperty, SerializedProperty parentProperty, TypeInfo[] typeInfos, string type)
             : base(currentProperty, parentProperty)
         {
-            _srAttribute = srAttribute;
+            _typeInfos = typeInfos;
             _type = type;
         }
 
         protected override void DoApply()
         {
-            var typeInfo = _srAttribute.TypeInfoByPath(_type);
-            if(typeInfo == null)
+            TypeInfo selectedTypeInfo = _typeInfos.FirstOrDefault(t => t.Path == _type);
+            if (selectedTypeInfo == null)
             {
                 Debug.LogErrorFormat("Type '{0}' not found.", _type);
                 return;
             }
 
-            Undo.RegisterCompleteObjectUndo(Property.serializedObject.targetObject, "Create instance of " + typeInfo.Type);
+            Undo.RegisterCompleteObjectUndo(Property.serializedObject.targetObject, "Create instance of " + selectedTypeInfo.Type.Name);
             Undo.FlushUndoRecordObjects();
 
-            var instance = Activator.CreateInstance(typeInfo.Type);
-            _srAttribute.OnCreate(instance);
-
+            var instance = Activator.CreateInstance(selectedTypeInfo.Type);
             Property.managedReferenceValue = instance;
             Property.serializedObject.ApplyModifiedProperties();
         }

@@ -9,5 +9,6 @@
     "_formerlySerializedTypeOnAssetImport": true,
     "_doubleCleanOnEditorUpdate": true,
     "_doubleCleanOnUndoRedo": true,
-    "_doubleCleanOnAssetSave": true
+    "_doubleCleanOnAssetSave": true,
+    "_duplicateMode": 0
 }

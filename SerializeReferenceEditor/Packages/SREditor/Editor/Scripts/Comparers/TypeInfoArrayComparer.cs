@@ -1,12 +1,13 @@
 using System.Collections.Generic;
+using SerializeReferenceEditor.Editor.Services;
 
 namespace SerializeReferenceEditor.Editor.Comparers
 {
-    public class TypeInfoArrayComparer : IEqualityComparer<SRAttribute.TypeInfo[]>
+    public class TypeInfoArrayComparer : IEqualityComparer<TypeInfo[]>
     {
         private static readonly TypeInfoComparer ElementComparer = new();
 
-        public bool Equals(SRAttribute.TypeInfo[] first, SRAttribute.TypeInfo[] second)
+        public bool Equals(TypeInfo[] first, TypeInfo[] second)
         {
             if (first == second)
                 return true;
@@ -24,7 +25,7 @@ namespace SerializeReferenceEditor.Editor.Comparers
             return true;
         }
 
-        public int GetHashCode(SRAttribute.TypeInfo[] array)
+        public int GetHashCode(TypeInfo[] array)
         {
             var hash = 17;
             foreach (var element in array) 

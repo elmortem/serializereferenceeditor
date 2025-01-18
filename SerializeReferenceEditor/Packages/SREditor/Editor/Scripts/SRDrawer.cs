@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using SerializeReferenceEditor.Editor.Drawers;
+using SerializeReferenceEditor.Editor.Services;
 using SerializeReferenceEditor.Editor.SRActions;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
@@ -17,14 +18,46 @@ namespace SerializeReferenceEditor.Editor
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			int index;
-			if(_array == null)
-				_array = GetParentArray(property, out index);
-			else
-				index = GetArrayIndex(property);
-
 			_srAttribute ??= attribute as SRAttribute;
-			var typeName = _nameService.GetTypeName(property.managedReferenceFullTypename);
+			Draw(position, property, label, _srAttribute.Types);
+		}
+
+		private Type GetManagedReferenceFieldType(SerializedProperty property)
+		{
+			string[] typeSplit = property.managedReferenceFieldTypename.Split(char.Parse(" "));
+			string typeAssembly = typeSplit[0];
+			string typeClass = typeSplit[1];
+			return Type.GetType(typeClass + ", " + typeAssembly);
+		}
+
+		public void Draw(Rect position, SerializedProperty property, GUIContent label, params Type[] types)
+		{
+			TypeInfo[] typeInfos;
+			if (types == null || types.Length == 0)
+			{
+				var managedReferenceFieldType = GetManagedReferenceFieldType(property);
+				typeInfos = SRTypeCache.GetTypeInfos(managedReferenceFieldType);
+			}
+			else if (types.Length == 1)
+			{
+				typeInfos = SRTypeCache.GetTypeInfos(types[0]);
+			}
+			else
+			{
+				typeInfos = SRTypeCache.GetTypeInfos(types);
+			}
+
+			int index;
+			if (_array == null)
+			{
+				_array = GetParentArray(property, out index);
+			}
+			else
+			{
+				index = GetArrayIndex(property);
+			}
+
+			string typeName = _nameService.GetTypeName(property.managedReferenceFullTypename);
 			var typeNameContent = new GUIContent(typeName + (_array != null ? ("[" + index + "]") : ""));
 
 			float buttonWidth = 10f + GUI.skin.button.CalcSize(typeNameContent).x;
@@ -33,9 +66,10 @@ namespace SerializeReferenceEditor.Editor
 			var bgColor = GUI.backgroundColor;
 			GUI.backgroundColor = Color.green;
 			var buttonRect = new Rect(position.x + position.width - buttonWidth, position.y, buttonWidth, buttonHeight);
-			if(EditorGUI.DropdownButton(buttonRect, typeNameContent, FocusType.Passive))
+			
+			if (EditorGUI.DropdownButton(buttonRect, typeNameContent, FocusType.Passive))
 			{
-				ShowMenu(property);
+				ShowTypeSelectionMenu(property, typeInfos);
 				Event.current.Use();
 			}
 			GUI.backgroundColor = bgColor;
@@ -49,23 +83,16 @@ namespace SerializeReferenceEditor.Editor
 			return EditorGUI.GetPropertyHeight(property, label, true);
 		}
 
-		private void ShowMenu(SerializedProperty property)
+		private void ShowTypeSelectionMenu(SerializedProperty property, TypeInfo[] typeInfos)
 		{
-			if(_srAttribute.Types == null)
-				_srAttribute.SetTypeByName(property.managedReferenceFieldTypename);
-
-			var types = _srAttribute.Types;
-			if (types == null)
+			if (typeInfos == null)
 			{
-				Debug.LogError("Incorrect types");
+				Debug.LogError("Type infos array cannot be null");
 				return;
 			}
 
-			var typeTreeFactory = _cash.GetTypeTreeFactory(types);
-			var srActionFactory = new SRActionFactory(
-				property,
-				_array,
-				_srAttribute);
+			var typeTreeFactory = _cash.GetTypeTreeFactory(typeInfos);
+			var srActionFactory = new SRActionFactory(property, _array, typeInfos);
 
 			var searchWindow = SRTypesSearchWindowProvider.MakeTypesContainer(srActionFactory, typeTreeFactory);
 			SearchWindow.Open(new SearchWindowContext(GUIUtility.GUIToScreenPoint(Event.current.mousePosition)), searchWindow);

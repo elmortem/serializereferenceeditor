@@ -1,16 +1,16 @@
+#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace SerializeReferenceEditor
+namespace SerializeReferenceEditor.Services
 {
-#if UNITY_EDITOR
-	public static class SRTypeCache
+	public static class SRFormerlyTypeCache
 	{
 		private static readonly Dictionary<FormerlySerializedTypeAttribute, Type> _attributeTypes = new();
 
-		static SRTypeCache()
+		static SRFormerlyTypeCache()
 		{
 			CollectTypeReplacements();
 		}
@@ -103,5 +103,5 @@ namespace SerializeReferenceEditor
 				kvp.Value));
 		}
 	}
-#endif
 }
+#endif

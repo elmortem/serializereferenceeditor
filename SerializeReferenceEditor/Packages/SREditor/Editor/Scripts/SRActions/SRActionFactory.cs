@@ -6,20 +6,20 @@ namespace SerializeReferenceEditor.Editor.SRActions
     {
         private readonly SerializedProperty _currentProperty;
         private readonly SerializedProperty _parentProperty;
-        private readonly SRAttribute _srAttribute;
+        private readonly TypeInfo[] _typeInfos;
 
         public SRActionFactory(
             SerializedProperty currentProperty, 
             SerializedProperty parentProperty,
-            SRAttribute srAttribute)
+            TypeInfo[] typeInfos)
         {
             _currentProperty = currentProperty;
             _parentProperty = parentProperty;
-            _srAttribute = srAttribute;
+            _typeInfos = typeInfos;
         }
 
         public InstanceClassSRAction InstantiateBuild(string type)
-            => new(_currentProperty, _parentProperty, _srAttribute, type);
+            => new(_currentProperty, _parentProperty, _typeInfos, type);
 
         public ErasePropertySRAction EraseBuild()
             => new ErasePropertySRAction(_currentProperty, _parentProperty);

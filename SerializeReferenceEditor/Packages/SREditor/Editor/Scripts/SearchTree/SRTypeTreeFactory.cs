@@ -13,7 +13,7 @@ namespace SerializeReferenceEditor.Editor.Drawers
 		private readonly string[] _sortedTypePath;
 		private readonly NameService _nameService = new();
 
-		public SRTypeTreeFactory(SRAttribute.TypeInfo[] types)
+		public SRTypeTreeFactory(TypeInfo[] types)
 		{
 			Array.Sort(types, new TypeInfoComparer());
 			_sortedTypePath = types.Select(info => info.Path).ToArray();
