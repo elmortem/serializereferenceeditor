@@ -12,8 +12,10 @@ namespace Demo
 		[SerializeReference]
 		[SRDemo]
 		public List<AbstractData> List;
-		
+
 		[SerializeReference, SR]
 		public BaseTestData TestData;
+		
+		public CustomData CustomData;
 	}
 }

@@ -7,7 +7,7 @@
     "email": "elmortem@gmail.com", 
     "url": "https://makar.rs"
   },
-  "version": "1.2.13",
+  "version": "1.3.0",
   "unity": "2021.3",
   "description": "Unity SerializeReference editor with FormerlySerializedType attribute support for tracking renamed SerializeReference classes during refactoring and duplicate SerializeReference instance cleaning or make safe instance copy.",
   "keywords": [
@@ -17,12 +17,5 @@
 	"tools",
 	"utility"
   ],
-  "category": "Editor",
-  "samples": [
-    {
-      "displayName": "SR Editor Demo",
-      "description": "Scene and all classes for SR Editor Demo",
-      "path": "Samples~/Demo"
-    }
-  ]
+  "category": "Editor"
 }

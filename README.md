@@ -14,12 +14,12 @@ Download asset from Unity Asset Store:
 
 Or installation as a unity module via a git link in PackageManager:
 ```
-https://github.com/elmortem/serializereferenceeditor.git?path=SerializeReferenceEditor/Packages/SREditor
+https://github.com/elmortem/serializereferenceeditor.git?path=SerializeReferenceEditor/Assets/SREditor/Package
 ```
 
 Or direct editing of `Packages/manifest` is supported.json:
 ```
-"com.elmortem.serializereferenceeditor": "https://github.com/elmortem/serializereferenceeditor.git?path=SerializeReferenceEditor/Packages/SREditor",
+"com.elmortem.serializereferenceeditor": "https://github.com/elmortem/serializereferenceeditor.git?path=SerializeReferenceEditor/Assets/SREditor/Package",
 ```
 
 ## Main types
@@ -43,7 +43,7 @@ public List<AbstractData> DataList = new List<AbstractData>();
 
 You can override SRAttribute and implement a rule for processing instantiated objects.
 
-You can see an example in [SRDemoAttribute.cs](https://github.com/elmortem/serializereferenceeditor/tree/master/SerializeReferenceEditor/Packages/SREditor/Samples~/Demo/SRDemoAttribute.cs), where the `OnCreate` method was overriden:
+You can see an example in [SRDemoAttribute.cs](https://github.com/elmortem/serializereferenceeditor/blob/master/SerializeReferenceEditor/Assets/SREditor/Samples/Demo/SRDemoAttribute.cs), where the `OnCreate` method was overriden:
 ```csharp
 public override void OnCreate(object instance)
 {
@@ -58,7 +58,7 @@ public override void OnCreate(object instance)
 
 Mark classes with them if you want to customize the display name and nesting hierarchy in the search tree for a specific type.
 
-Example [FloatData.cs](https://github.com/elmortem/serializereferenceeditor/tree/master/SerializeReferenceEditor/Packages/SREditor/Samples~/Demo/Datas/FloatData.cs):
+Example [FloatData.cs](https://github.com/elmortem/serializereferenceeditor/blob/master/SerializeReferenceEditor/Assets/SREditor/Samples/Demo/Datas/FloatData.cs):
 ```csharp
 [SRName("Data/Simple types/Float")]  
 public class FloatData : AbstractData
@@ -69,6 +69,39 @@ public class FloatData : AbstractData
 ```
 
 You can modify the display settings for the class name without specifying an attribute by navigating to `Edit -> Project Settings -> SREditor`.
+
+## SRDrawer
+
+### SRDrawer.Draw
+
+`SRDrawer.Draw` is a key method for rendering fields with the `SerializeReference` attribute. It provides the following functionality:
+
+#### Key Features
+- Dynamic type resolution for the field
+- Type selection button displaying current type name
+- Array elements support
+- Integration with Unity's SearchWindow for type selection
+
+#### Method Parameters
+- `position`: Drawing area position and dimensions
+- `property`: Serialized property to draw
+- `label`: Field label to display
+- `types`: Optional array of allowed types
+
+Example [CustomDataDrawer.cs](https://github.com/elmortem/serializereferenceeditor/blob/master/SerializeReferenceEditor/Assets/SREditor/Samples/Demo/Editor/CustomDataDrawer.cs)
+```csharp
+[CustomPropertyDrawer(typeof(CustomData))]
+public class CustomDataDrawer : PropertyDrawer
+{
+    private SRDrawer _drawer = new();
+    
+    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+    {
+        var dataProperty = property.FindPropertyRelative("Data");
+        _drawer.Draw(position, dataProperty, label);
+    }
+}
+```
 
 ## Tools
 
@@ -90,7 +123,8 @@ Use `Tools -> SREditor -> Class Replacer` for replace Serialize Reference classe
 ### FormerlySerializedType attribute
 
 It is analogue of attribute FormerlySerializedAs, but works for Serialize Reference classes.
-Example [NewTestData.cs](https://github.com/elmortem/serializereferenceeditor/tree/master/SerializeReferenceEditor/Packages/SREditor/Samples~/Demo/NewTests/NewTestData.cs):
+
+Example [NewTestData.cs](https://github.com/elmortem/serializereferenceeditor/blob/master/SerializeReferenceEditor/Assets/SREditor/Samples/Demo/NewTests/NewTestData.cs):
 ```csharp
 [Serializable, SRName("New Test")]
 [FormerlySerializedType("SRDemo, Demo.OldTestData")]

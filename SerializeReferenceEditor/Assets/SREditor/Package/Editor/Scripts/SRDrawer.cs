@@ -19,7 +19,7 @@ namespace SerializeReferenceEditor.Editor
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			_srAttribute ??= attribute as SRAttribute;
-			Draw(position, property, label, _srAttribute.Types);
+			Draw(position, property, label, _srAttribute?.Types);
 		}
 
 		private Type GetManagedReferenceFieldType(SerializedProperty property)

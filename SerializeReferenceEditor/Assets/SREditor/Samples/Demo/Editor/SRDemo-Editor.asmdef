@@ -1,0 +1,18 @@
+{
+    "name": "SRDemo-Editor",
+    "rootNamespace": "Demo.Editor",
+    "references": [
+        "SREditor",
+        "SRDemo",
+        "SREditor-Editor"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

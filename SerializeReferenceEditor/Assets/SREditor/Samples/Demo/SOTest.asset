@@ -19,13 +19,20 @@ MonoBehaviour:
   - rid: 8191843295340527621
   TestData:
     rid: 4923825590164520962
+  CustomData:
+    Data:
+      rid: 1023199346265423876
   references:
     version: 2
     RefIds:
+    - rid: 1023199346265423876
+      type: {class: IntegerData, ns: Demo, asm: SRDemo}
+      data:
+        Int: 239
     - rid: 4923825590164520962
       type: {class: NewTestData, ns: Demo.NewTests, asm: NewTest}
       data:
-        Value: 333
+        Value: 3337
         FloatValue: 0
         BoolValue: 0
     - rid: 8191843295340527619
