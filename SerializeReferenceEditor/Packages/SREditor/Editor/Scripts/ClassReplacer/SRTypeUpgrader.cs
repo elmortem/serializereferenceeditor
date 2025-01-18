@@ -107,6 +107,18 @@ namespace SerializeReferenceEditor.Editor.ClassReplacer
 			{
 				AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceUpdate);
 				EditorUtility.SetDirty(obj);
+
+				EditorApplication.delayCall += () =>
+				{
+					if (Selection.activeObject == obj)
+					{
+						Selection.activeObject = null;
+						EditorApplication.delayCall += () =>
+						{
+							Selection.activeObject = obj;
+						};
+					}
+				};
 			}
 		}
 	}
