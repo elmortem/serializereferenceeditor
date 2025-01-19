@@ -83,7 +83,11 @@ namespace SerializeReferenceEditor.Editor
 			GUI.backgroundColor = bgColor;
 		
 			var propertyRect = position;
-			EditorGUI.PropertyField(propertyRect, property, label, options.WithChild);
+			
+			if(options.WithChild)
+				EditorGUI.PropertyField(propertyRect, property, label, true);
+			else
+				EditorGUI.LabelField(propertyRect, label);
 		}
 
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
