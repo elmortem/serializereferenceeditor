@@ -15,6 +15,7 @@ namespace SerializeReferenceEditor.Editor
 		private static readonly SRCashTypeSearchTree _cash = new();
 		private SRAttribute _srAttribute;
 		private SerializedProperty _array;
+		private readonly SRDrawerOptions _options = new() { WithChild = true, ButtonTitle = true };
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
@@ -33,10 +34,10 @@ namespace SerializeReferenceEditor.Editor
 		public void Draw(Rect position, SerializedProperty property, GUIContent label,
 			params Type[] types)
 		{
-			Draw(position, property, label, true, types);
+			Draw(position, property, label, _options, types);
 		}
 
-		public void Draw(Rect position, SerializedProperty property, GUIContent label, bool drawChild, params Type[] types)
+		public void Draw(Rect position, SerializedProperty property, GUIContent label, SRDrawerOptions options, params Type[] types)
 		{
 			TypeInfo[] typeInfos;
 			if (types == null || types.Length == 0)
@@ -64,16 +65,17 @@ namespace SerializeReferenceEditor.Editor
 			}
 
 			string typeName = _nameService.GetTypeName(property.managedReferenceFullTypename);
-			var typeNameContent = new GUIContent(typeName + (_array != null ? ("[" + index + "]") : ""));
+			var buttonTitle = typeName + (_array != null ? ("[" + index + "]") : "");
+			var buttonContent = new GUIContent(options.ButtonTitle ? buttonTitle : string.Empty);
 
-			float buttonWidth = 10f + GUI.skin.button.CalcSize(typeNameContent).x;
+			float buttonWidth = 10f + GUI.skin.button.CalcSize(buttonContent).x;
 			float buttonHeight = EditorGUI.GetPropertyHeight(property, label, false);
 
 			var bgColor = GUI.backgroundColor;
 			GUI.backgroundColor = Color.green;
 			var buttonRect = new Rect(position.x + position.width - buttonWidth, position.y, buttonWidth, buttonHeight);
 			
-			if (EditorGUI.DropdownButton(buttonRect, typeNameContent, FocusType.Passive))
+			if (EditorGUI.DropdownButton(buttonRect, buttonContent, FocusType.Passive))
 			{
 				ShowTypeSelectionMenu(property, typeInfos);
 				Event.current.Use();
@@ -81,7 +83,7 @@ namespace SerializeReferenceEditor.Editor
 			GUI.backgroundColor = bgColor;
 		
 			var propertyRect = position;
-			EditorGUI.PropertyField(propertyRect, property, label, drawChild);
+			EditorGUI.PropertyField(propertyRect, property, label, options.WithChild);
 		}
 
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
