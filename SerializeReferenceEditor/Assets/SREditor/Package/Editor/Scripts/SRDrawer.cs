@@ -30,7 +30,13 @@ namespace SerializeReferenceEditor.Editor
 			return Type.GetType(typeClass + ", " + typeAssembly);
 		}
 
-		public void Draw(Rect position, SerializedProperty property, GUIContent label, params Type[] types)
+		public void Draw(Rect position, SerializedProperty property, GUIContent label,
+			params Type[] types)
+		{
+			Draw(position, property, label, true, types);
+		}
+
+		public void Draw(Rect position, SerializedProperty property, GUIContent label, bool drawChild, params Type[] types)
 		{
 			TypeInfo[] typeInfos;
 			if (types == null || types.Length == 0)
@@ -75,12 +81,17 @@ namespace SerializeReferenceEditor.Editor
 			GUI.backgroundColor = bgColor;
 		
 			var propertyRect = position;
-			EditorGUI.PropertyField(propertyRect, property, label, true);
+			EditorGUI.PropertyField(propertyRect, property, label, drawChild);
 		}
 
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
-			return EditorGUI.GetPropertyHeight(property, label, true);
+			return GetPropertyHeight(property, label, true);
+		}
+		
+		public float GetPropertyHeight(SerializedProperty property, GUIContent label, bool includeChild)
+		{
+			return EditorGUI.GetPropertyHeight(property, label, includeChild);
 		}
 
 		private void ShowTypeSelectionMenu(SerializedProperty property, TypeInfo[] typeInfos)
