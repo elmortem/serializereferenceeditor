@@ -15,7 +15,7 @@ namespace SerializeReferenceEditor.Editor
 		private static readonly SRCashTypeSearchTree _cash = new();
 		private SRAttribute _srAttribute;
 		private SerializedProperty _array;
-		private readonly SRDrawerOptions _options = new() { WithChild = true, ButtonTitle = true };
+		private readonly SRDrawerOptions _options = new() { WithChild = true, ButtonTitle = true, DisableExpand = false };
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
@@ -83,11 +83,11 @@ namespace SerializeReferenceEditor.Editor
 			GUI.backgroundColor = bgColor;
 		
 			var propertyRect = position;
-			
-			if(options.WithChild)
-				EditorGUI.PropertyField(propertyRect, property, label, true);
-			else
+
+			if (options.DisableExpand)
 				EditorGUI.LabelField(propertyRect, label);
+			else
+				EditorGUI.PropertyField(propertyRect, property, label, options.WithChild);
 		}
 
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)

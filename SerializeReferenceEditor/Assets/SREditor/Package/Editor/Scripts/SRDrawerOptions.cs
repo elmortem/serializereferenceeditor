@@ -4,5 +4,6 @@ namespace SerializeReferenceEditor.Editor
 	{
 		public bool WithChild { get; set; }
 		public bool ButtonTitle { get; set; }
+		public bool DisableExpand { get; set; }
 	}
 }
