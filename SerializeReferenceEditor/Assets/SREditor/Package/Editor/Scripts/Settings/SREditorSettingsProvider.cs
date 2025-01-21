@@ -7,9 +7,11 @@ namespace SerializeReferenceEditor.Editor.Settings
 {
 	public class SREditorSettingsProvider : SettingsProvider
 	{
+		public const string ProjectSettingsPath ="Project/Serialize Reference Editor";
+		
 		public SREditorSettingsProvider(
 		) : base(
-			"Project/Serialize Reference Editor",
+			ProjectSettingsPath,
 			SettingsScope.Project,
 			new HashSet<string>(new[] { "SREditor", "Serialize Reference Editor", "SerializeReference" }))
 		{

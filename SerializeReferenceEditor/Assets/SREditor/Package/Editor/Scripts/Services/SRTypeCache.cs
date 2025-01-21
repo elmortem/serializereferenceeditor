@@ -119,7 +119,8 @@ namespace SerializeReferenceEditor.Editor.Services
 				&& (childType == baseType || 
 					baseType.IsInterface 
 						? baseType.IsAssignableFrom(childType) 
-						: childType.IsSubclassOf(baseType));
+						: childType.IsSubclassOf(baseType))
+				&& childType.GetCustomAttributes(typeof(SRHiddenAttribute), false).Length <= 0;
 		}
 	}
 }

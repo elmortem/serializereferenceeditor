@@ -72,5 +72,11 @@ namespace SerializeReferenceEditor.Editor.Settings
 		[SettingsProvider]
 		internal static SettingsProvider CreateSettingsProvider() 
 			=> new SREditorSettingsProvider();
+		
+		[MenuItem("Tools/SREditor/Settings")]
+		static void OpenProjectSettings()
+		{
+			SettingsService.OpenProjectSettings(SREditorSettingsProvider.ProjectSettingsPath);
+		}
 	}
 }

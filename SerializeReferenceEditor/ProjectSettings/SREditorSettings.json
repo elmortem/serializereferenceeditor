@@ -7,7 +7,7 @@
     "_formerlySerializedTypeOnSceneSave": true,
     "_formerlySerializedTypeOnAssetSelect": true,
     "_formerlySerializedTypeOnAssetImport": true,
-    "_doubleCleanOnEditorUpdate": true,
+    "_doubleCleanOnEditorUpdate": false,
     "_doubleCleanOnUndoRedo": true,
     "_doubleCleanOnAssetSave": true,
     "_duplicateMode": 0

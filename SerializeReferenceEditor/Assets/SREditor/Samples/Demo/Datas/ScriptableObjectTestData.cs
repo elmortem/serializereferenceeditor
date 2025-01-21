@@ -1,8 +1,9 @@
-﻿using SerializeReferenceEditor;
+﻿using System;
+using SerializeReferenceEditor;
 
 namespace Demo
 {
-	[SRName("Data/Custom types/ScriptableObjectTest")]
+	[Serializable, SRName("Data/Custom types/ScriptableObjectTest")]
 	public class ScriptableObjectTestData : AbstractData
 	{
 		public ScriptableObjectTest Test;

@@ -12,12 +12,8 @@ namespace Demo.Editor
 		
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			//EditorGUI.BeginProperty(position, label, property);
-			
 			var dataProperty = property.FindPropertyRelative("Data");
-			_drawer.Draw(position, dataProperty, label);
-			
-			//EditorGUI.EndProperty();
+			_drawer.Draw(position, dataProperty, new GUIContent("Custom Title"));
 		}
 
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)

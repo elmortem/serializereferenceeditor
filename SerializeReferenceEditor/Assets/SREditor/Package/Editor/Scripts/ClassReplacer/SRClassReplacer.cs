@@ -75,13 +75,13 @@ namespace SerializeReferenceEditor.Editor.ClassReplacer
 
 		private bool IsTypeSerializable(Type type)
 		{
-			if (type == null) 
+			if (type == null)
 				return false;
-			if (!type.IsClass || type.IsAbstract || type.IsInterface) 
+			if (!type.IsClass || type.IsAbstract || type.IsInterface)
 				return false;
-			if (type.Name.Contains("<>")) 
+			if (type.Name.Contains("<>"))
 				return false;
-			if (type.IsGenericType || type.ContainsGenericParameters) 
+			if (type.IsGenericType || type.ContainsGenericParameters)
 				return false;
 			if (type.Namespace?.StartsWith("System") == true || type.IsSubclassOf(typeof(ScriptableObject)))
 				return false;

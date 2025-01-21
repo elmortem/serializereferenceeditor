@@ -1,8 +1,9 @@
-﻿using SerializeReferenceEditor;
+﻿using System;
+using SerializeReferenceEditor;
 
 namespace Demo
 {
-	[SRName("Data/Simple types/Integer")]
+	[Serializable, SRName("Data/Simple types/Integer")]
 	public class IntegerData : AbstractData
 	{
 		public int Int;
