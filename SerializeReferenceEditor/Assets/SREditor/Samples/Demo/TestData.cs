@@ -12,4 +12,10 @@ namespace Demo
     {
         public int Value;
     }
+    
+    [Serializable, SRName("Old New Test")]
+    public class NewTestData : BaseTestData
+    {
+        public string Value;
+    }
 }

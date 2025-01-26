@@ -11,11 +11,13 @@ namespace SerializeReferenceEditor.Editor.ClassReplacer
 	[InitializeOnLoad]
 	public class SRTypeUpgrader : AssetPostprocessor
 	{
-		private static HashSet<string> _processedAssets = new();
+		private static HashSet<string> _processedAssets = new HashSet<string>();
+		private static HashSet<int> _processingObjects = new HashSet<int>();
 
 		static SRTypeUpgrader()
 		{
 			_processedAssets.Clear();
+			_processingObjects.Clear();
 
 			EditorSceneManager.sceneSaving -= OnSceneSaving;
 			EditorSceneManager.sceneSaving += OnSceneSaving;
@@ -78,48 +80,74 @@ namespace SerializeReferenceEditor.Editor.ClassReplacer
 
 		private static void ProcessObject(Object obj)
 		{
-			if (obj == null) return;
+			if (obj == null) 
+				return;
 
-			var assetPath = AssetDatabase.GetAssetPath(obj);
-			if (string.IsNullOrEmpty(assetPath)) return;
+			int instanceId = obj.GetInstanceID();
+			if (!_processingObjects.Add(instanceId)) 
+				return;
 
-			if (PrefabUtility.IsPartOfPrefabAsset(obj))
+			try
 			{
-				if (_processedAssets.Contains(assetPath)) return;
-				_processedAssets.Add(assetPath);
-			}
+				var assetPath = AssetDatabase.GetAssetPath(obj);
+				if (string.IsNullOrEmpty(assetPath)) return;
 
-			bool modified = false;
-			foreach (var (oldAssembly, oldType, newType) in SRFormerlyTypeCache.GetAllReplacements())
-			{
-				var oldTypePattern = string.IsNullOrEmpty(oldAssembly) ? oldType : $"{oldAssembly}, {oldType}";
-				var newAssembly = newType.Assembly.GetName().Name;
-				var newTypePattern = string.IsNullOrEmpty(newAssembly)
-					? newType.FullName
-					: $"{newAssembly}, {newType.FullName}";
-
-				if (TypeReplacer.ReplaceTypeInFile(assetPath, oldTypePattern, newTypePattern))
+				if (PrefabUtility.IsPartOfPrefabAsset(obj))
 				{
-					modified = true;
+					if (_processedAssets.Contains(assetPath)) 
+						return;
+					
+					_processedAssets.Add(assetPath);
+				}
+
+				bool modified = false;
+				foreach (var (oldAssembly, oldType, newType) in SRFormerlyTypeCache.GetAllReplacements())
+				{
+					var oldTypePattern = string.IsNullOrEmpty(oldAssembly) ? oldType : $"{oldAssembly}, {oldType}";
+					var newAssembly = newType.Assembly.GetName().Name;
+					var newTypePattern = string.IsNullOrEmpty(newAssembly)
+						? newType.FullName
+						: $"{newAssembly}, {newType.FullName}";
+
+					if (TypeReplacer.ReplaceTypeInFile(assetPath, oldTypePattern, newTypePattern))
+					{
+						modified = true;
+					}
+				}
+
+				if (modified)
+				{
+					AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceUpdate);
+					EditorUtility.SetDirty(obj);
+
+					EditorApplication.delayCall += () =>
+					{
+						if (Selection.activeObject == obj)
+						{
+							Selection.activeObject = null;
+							EditorApplication.delayCall += () =>
+							{
+								Selection.activeObject = obj;
+								_processingObjects.Remove(instanceId);
+								_processedAssets.Clear();
+							};
+						}
+						else
+						{
+							_processingObjects.Remove(instanceId);
+							_processedAssets.Clear();
+						}
+					};
+				}
+				else
+				{
+					_processingObjects.Remove(instanceId);
 				}
 			}
-
-			if (modified)
+			catch
 			{
-				AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceUpdate);
-				EditorUtility.SetDirty(obj);
-
-				EditorApplication.delayCall += () =>
-				{
-					if (Selection.activeObject == obj)
-					{
-						Selection.activeObject = null;
-						EditorApplication.delayCall += () =>
-						{
-							Selection.activeObject = obj;
-						};
-					}
-				};
+				_processingObjects.Remove(instanceId);
+				throw;
 			}
 		}
 	}

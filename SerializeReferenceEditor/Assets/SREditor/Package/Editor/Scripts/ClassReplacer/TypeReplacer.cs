@@ -1,142 +1,154 @@
 using System.IO;
-using System.Linq;
 using UnityEditor;
 
 namespace SerializeReferenceEditor.Editor.ClassReplacer
 {
-    public static class TypeReplacer
-    {
-        public static bool ReplaceTypeInFile(string path, string oldTypePattern, string newTypePattern)
-        {
-            if (AssetDatabase.IsValidFolder(path))
-                return false;
-            
-            string content = File.ReadAllText(path);
-            bool wasModified = false;
+	public static class TypeReplacer
+	{
+		public static bool ReplaceTypeInFile(string path, string oldTypePattern, string newTypePattern)
+		{
+			if (AssetDatabase.IsValidFolder(path))
+				return false;
+			
+			string content = File.ReadAllText(path);
+			bool wasModified = false;
 
-            string oldClassName;
-            string newClassName;
-            if (oldTypePattern.Contains(","))
-            {
-                var parts = oldTypePattern.Split(new[] { ',' }, 2);
-                oldClassName = parts[1].Trim().Split('.').Last();
-            }
-            else
-            {
-                oldClassName = oldTypePattern.Split('.').Last();
-            }
-            
-            if (newTypePattern.Contains(","))
-            {
-                var parts = newTypePattern.Split(new[] { ',' }, 2);
-                newClassName = parts[1].Trim().Split('.').Last();
-            }
-            else
-            {
-                newClassName = newTypePattern.Split('.').Last();
-            }
+			string newClassName;
+			string newNamespace = string.Empty;
+			string newAssembly = string.Empty;
+			
+			if (newTypePattern.Contains(","))
+			{
+				var parts = newTypePattern.Split(new[] { ',' }, 2);
+				newAssembly = parts[0].Trim();
+				var fullType = parts[1].Trim();
+				var typeParts = fullType.Split('.');
+				newClassName = typeParts[^1];
+				if (typeParts.Length > 1)
+				{
+					newNamespace = string.Join(".", typeParts, 0, typeParts.Length - 1);
+				}
+			}
+			else
+			{
+				var typeParts = newTypePattern.Split('.');
+				newClassName = typeParts[^1];
+				if (typeParts.Length > 1)
+				{
+					newNamespace = string.Join(".", typeParts, 0, typeParts.Length - 1);
+				}
+			}
 
-            var referencesSection = System.Text.RegularExpressions.Regex.Match(content, @"references:\s*\n\s*version:\s*2\s*\n\s*RefIds:\s*(?:\n|.)*?(?=\n\s*\n|$)");
-            if (referencesSection.Success)
-            {
-                string newReferencesSection = System.Text.RegularExpressions.Regex.Replace(
-                    referencesSection.Value,
-                    @"type:\s*{\s*class:\s*(\w+),\s*ns:\s*([\w.]+)(?:,\s*asm:\s*(\w+))?}",
-                    m => 
-                    {
-                        var className = m.Groups[1].Value;
-                        var ns = m.Groups[2].Value;
-                        var fullTypeName = $"{ns}.{className}";
-                        
-                        if (m.Groups[3].Success)
-                        {
-                            var oldAsm = m.Groups[3].Value;
-                            if (oldTypePattern.Contains(","))
-                            {
-                                var compareValue = $"{oldAsm}, {fullTypeName}";
-                                if (compareValue != oldTypePattern)
-                                {
-                                    return m.Value;
-                                }
-                            }
-                            else if (fullTypeName != oldTypePattern)
-                            {
-                                return m.Value;
-                            }
-                        }
-                        else if (fullTypeName != oldTypePattern)
-                        {
-                            return m.Value;
-                        }
+			string oldClassName;
+			string oldNamespace;
+			string oldAssembly;
+			
+			if (oldTypePattern.Contains(","))
+			{
+				var parts = oldTypePattern.Split(new[] { ',' }, 2);
+				oldAssembly = parts[0].Trim();
+				var fullType = parts[1].Trim();
+				var typeParts = fullType.Split('.');
+				oldClassName = typeParts[^1];
+				if (typeParts.Length > 1)
+				{
+					oldNamespace = string.Join(".", typeParts, 0, typeParts.Length - 1);
+				}
+				else
+				{
+					oldNamespace = newNamespace;
+				}
+			}
+			else
+			{
+				var typeParts = oldTypePattern.Split('.');
+				oldClassName = typeParts[^1];
+				if (typeParts.Length > 1)
+				{
+					oldNamespace = string.Join(".", typeParts, 0, typeParts.Length - 1);
+				}
+				else
+				{
+					oldNamespace = newNamespace;
+				}
+				oldAssembly = newAssembly;
+			}
 
-                        string newAssembly = null;
-                        string newTypeOnly = newTypePattern;
-                        
-                        if (newTypePattern.Contains(","))
-                        {
-                            var parts = newTypePattern.Split(new[] { ',' }, 2);
-                            newAssembly = parts[0].Trim();
-                            newTypeOnly = parts[1].Trim();
-                        }
-                        
-                        var lastDot = newTypeOnly.LastIndexOf('.');
-                        if (lastDot == -1) return m.Value;
-                        var newClassNameFromType = newTypeOnly.Substring(lastDot + 1);
-                        var newNs = newTypeOnly.Substring(0, lastDot);
-                        
-                        var asmString = string.IsNullOrEmpty(newAssembly) ? "Assembly-CSharp" : newAssembly;
-                        return $"type: {{ class: {newClassNameFromType}, ns: {newNs}, asm: {asmString} }}";
-                    }
-                );
+			var referencesSection = System.Text.RegularExpressions.Regex.Match(content, @"references:\s*\n\s*version:\s*2\s*\n\s*RefIds:\s*(?:\n|.)*?(?=\n\s*\n|$)");
+			if (referencesSection.Success)
+			{
+				string newReferencesSection = System.Text.RegularExpressions.Regex.Replace(
+					referencesSection.Value,
+					@"type:\s*{\s*class:\s*(\w+),\s*ns:\s*([\w.]+)(?:,\s*asm:\s*(\w+))?}",
+					m => 
+					{
+						var className = m.Groups[1].Value;
+						var ns = m.Groups[2].Value;
+						var asm = m.Groups[3].Success ? m.Groups[3].Value : string.Empty;
+						
+						if (className != oldClassName)
+							return m.Value;
+							
+						if (oldNamespace != newNamespace && ns != oldNamespace)
+							return m.Value;
+						
+						if (oldAssembly != newAssembly && asm != oldAssembly)
+							return m.Value;
 
-                if (referencesSection.Value != newReferencesSection)
-                {
-                    content = content.Replace(referencesSection.Value, newReferencesSection);
-                    wasModified = true;
-                }
-            }
+						var resultAssembly = string.IsNullOrEmpty(newAssembly) ? "Assembly-CSharp" : newAssembly;
+						return $"type: {{ class: {newClassName}, ns: {newNamespace}, asm: {resultAssembly} }}";
+					}
+				);
 
-            var classPattern = $@"type:\s*{{\s*class:\s*{oldClassName}\s*,";
-            if (System.Text.RegularExpressions.Regex.IsMatch(content, classPattern))
-            {
-                content = System.Text.RegularExpressions.Regex.Replace(content, classPattern, $"type: {{ class: {newClassName},");
-                wasModified = true;
-            }
+				if (referencesSection.Value != newReferencesSection)
+				{
+					content = content.Replace(referencesSection.Value, newReferencesSection);
+					wasModified = true;
+				}
+			}
 
-            var managedReferencesPattern = @"managedReferences\[\d+\]:\s*(\w+)\s+(\w+(?:\.\w+)*)";
-            var managedReferencesMatches = System.Text.RegularExpressions.Regex.Matches(content, managedReferencesPattern);
-            
-            foreach (System.Text.RegularExpressions.Match match in managedReferencesMatches)
-            {
-                var assembly = match.Groups[1].Value;
-                var type = match.Groups[2].Value;
-                var fullType = $"{assembly}, {type}";
+			var typePattern = $@"type:\s*{{\s*class:\s*{oldClassName},\s*ns:\s*{oldNamespace}(?:,\s*asm:\s*{oldAssembly})?}}";
+			if (System.Text.RegularExpressions.Regex.IsMatch(content, typePattern))
+			{
+				var resultAssembly = string.IsNullOrEmpty(newAssembly) ? "Assembly-CSharp" : newAssembly;
+				var replacement = $"type: {{ class: {newClassName}, ns: {newNamespace}, asm: {resultAssembly} }}";
+				content = System.Text.RegularExpressions.Regex.Replace(content, typePattern, replacement);
+				wasModified = true;
+			}
 
-                if (fullType == oldTypePattern || type == oldTypePattern)
-                {
-                    if (newTypePattern.Contains(","))
-                    {
-                        var parts = newTypePattern.Split(new[] { ',' }, 2);
-                        assembly = parts[0].Trim();
-                        type = parts[1].Trim();
-                    }
-                    else
-                    {
-                        type = newTypePattern;
-                    }
+			var managedReferencesPattern = @"managedReferences\[\d+\]:\s*(\w+)\s+([\w.]+(?:\.[\w.]+)*)";
+			var managedReferencesMatches = System.Text.RegularExpressions.Regex.Matches(content, managedReferencesPattern);
+			
+			foreach (System.Text.RegularExpressions.Match match in managedReferencesMatches)
+			{
+				var assembly = match.Groups[1].Value;
+				var fullType = match.Groups[2].Value;
+				var typeParts = fullType.Split('.');
+				var className = typeParts[^1];
+				var ns = typeParts.Length > 1 ? string.Join(".", typeParts, 0, typeParts.Length - 1) : string.Empty;
 
-                    var newReference = $"managedReferences[{match.Groups[0].Value.Split('[')[1].Split(']')[0]}]: {assembly} {type}";
-                    content = content.Replace(match.Value, newReference);
-                    wasModified = true;
-                }
-            }
+				if (className != oldClassName)
+					continue;
 
-            if (wasModified)
-            {
-                File.WriteAllText(path, content);
-            }
+				if (oldNamespace != newNamespace && ns != oldNamespace)
+					continue;
 
-            return wasModified;
-        }
-    }
+				if (oldAssembly != newAssembly && assembly != oldAssembly)
+					continue;
+
+				var resultAssembly = string.IsNullOrEmpty(newAssembly) ? assembly : newAssembly;
+				var newFullType = string.IsNullOrEmpty(newNamespace) ? newClassName : $"{newNamespace}.{newClassName}";
+				var newReference = $"managedReferences[{match.Groups[0].Value.Split('[')[1].Split(']')[0]}]: {resultAssembly} {newFullType}";
+				content = content.Replace(match.Value, newReference);
+				wasModified = true;
+			}
+
+			if (wasModified)
+			{
+				File.WriteAllText(path, content);
+			}
+
+			return wasModified;
+		}
+	}
 }
