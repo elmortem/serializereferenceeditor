@@ -89,6 +89,25 @@ namespace SerializeReferenceEditor.Editor
 			else
 				EditorGUI.PropertyField(propertyRect, property, label, options.WithChild);
 		}
+		
+		public float GetButtonWidth(SerializedProperty property, SRDrawerOptions options)
+		{
+			int index;
+			if (_array == null)
+			{
+				_array = GetParentArray(property, out index);
+			}
+			else
+			{
+				index = GetArrayIndex(property);
+			}
+
+			string typeName = _nameService.GetTypeName(property.managedReferenceFullTypename);
+			var buttonTitle = typeName + (_array != null ? ("[" + index + "]") : "");
+			var buttonContent = new GUIContent(options.ButtonTitle ? buttonTitle : string.Empty);
+
+			return 10f + GUI.skin.button.CalcSize(buttonContent).x;
+		}
 
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
