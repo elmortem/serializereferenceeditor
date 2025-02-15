@@ -40,9 +40,16 @@ namespace SerializeReferenceEditor.Editor.DoubleCleaner
 			}
 			else
 			{
-				var serializedObject = new SerializedObject(asset);
-				var iterator = serializedObject.GetIterator();
-				ProcessSerializedProperty(iterator, duplicateMode, seenObjects);
+				try
+				{
+					var serializedObject = new SerializedObject(asset);
+					var iterator = serializedObject.GetIterator();
+					ProcessSerializedProperty(iterator, duplicateMode, seenObjects);
+				}
+				catch (Exception ex)
+				{
+					Debug.LogError(ex);
+				}
 			}
 		}
 	

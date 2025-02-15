@@ -93,14 +93,13 @@ namespace SerializeReferenceEditor.Editor.ClassReplacer
 			try
 			{
 				var assetPath = AssetDatabase.GetAssetPath(obj);
-				if (string.IsNullOrEmpty(assetPath)) return;
+				if (string.IsNullOrEmpty(assetPath)) 
+					return;
 
 				if (PrefabUtility.IsPartOfPrefabAsset(obj))
 				{
-					if (_processedAssets.Contains(assetPath)) 
+					if (!_processedAssets.Add(assetPath)) 
 						return;
-					
-					_processedAssets.Add(assetPath);
 				}
 
 				bool modified = false;
