@@ -69,16 +69,16 @@ namespace SerializeReferenceEditor.Editor
 			var buttonContent = new GUIContent(options.ButtonTitle ? buttonTitle : string.Empty);
 
 			float buttonWidth = 10f + GUI.skin.button.CalcSize(buttonContent).x;
+			var lastIsExpanded = property.isExpanded;
+			property.isExpanded = false;
 			float buttonHeight = EditorGUI.GetPropertyHeight(property, label, false);
+			property.isExpanded = lastIsExpanded;
 
 			var bgColor = GUI.backgroundColor;
 			GUI.backgroundColor = Color.green;
 			var buttonRect = new Rect(position.x + position.width - buttonWidth, position.y, buttonWidth, buttonHeight);
 			
-			Vector2 mousePos = Event.current.mousePosition;
-			mousePos.y = Screen.height - mousePos.y;
-			Vector2 guiMousePos = GUIUtility.GUIToScreenPoint(mousePos);
-			if (EditorGUI.DropdownButton(buttonRect, buttonContent, FocusType.Passive) && buttonRect.Contains(guiMousePos))
+			if (EditorGUI.DropdownButton(buttonRect, buttonContent, FocusType.Passive))
 			{
 				ShowTypeSelectionMenu(property, typeInfos);
 				Event.current.Use();
