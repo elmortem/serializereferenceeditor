@@ -75,7 +75,10 @@ namespace SerializeReferenceEditor.Editor
 			GUI.backgroundColor = Color.green;
 			var buttonRect = new Rect(position.x + position.width - buttonWidth, position.y, buttonWidth, buttonHeight);
 			
-			if (EditorGUI.DropdownButton(buttonRect, buttonContent, FocusType.Passive))
+			Vector2 mousePos = Event.current.mousePosition;
+			mousePos.y = Screen.height - mousePos.y;
+			Vector2 guiMousePos = GUIUtility.GUIToScreenPoint(mousePos);
+			if (EditorGUI.DropdownButton(buttonRect, buttonContent, FocusType.Passive) && buttonRect.Contains(guiMousePos))
 			{
 				ShowTypeSelectionMenu(property, typeInfos);
 				Event.current.Use();
