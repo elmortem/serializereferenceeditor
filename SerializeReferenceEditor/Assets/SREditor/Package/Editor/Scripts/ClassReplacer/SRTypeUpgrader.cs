@@ -73,6 +73,9 @@ namespace SerializeReferenceEditor.Editor.ClassReplacer
 			{
 				foreach (var obj in Selection.objects)
 				{
+                    if (_processingObjects.Contains(obj.GetInstanceID()))
+                    	continue;
+
 					ProcessObject(obj);
 				}
 			}
