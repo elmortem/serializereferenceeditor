@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using SerializeReferenceEditor.Services;
 
 namespace SerializeReferenceEditor
 {
@@ -73,7 +72,7 @@ namespace SerializeReferenceEditor
             if (_isInitialized)
                 return;
 
-            var type = SRFormerlyTypeCache.GetTypeForAttribute(this);
+            var type = Services.SRFormerlyTypeCache.GetTypeForAttribute(this);
             if (type != null)
             {
                 _oldAssemblyName ??= type.Assembly.GetName().Name ?? string.Empty;
