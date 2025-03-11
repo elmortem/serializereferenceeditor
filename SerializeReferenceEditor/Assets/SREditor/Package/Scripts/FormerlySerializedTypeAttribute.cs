@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
+#if UNITY_EDITOR
 using SerializeReferenceEditor.Services;
+#endif
 
 namespace SerializeReferenceEditor
 {
