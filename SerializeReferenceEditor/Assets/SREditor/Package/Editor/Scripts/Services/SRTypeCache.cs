@@ -29,14 +29,15 @@ namespace SerializeReferenceEditor.Editor.Services
 				return null;
 			}
 
-			TypeInfo[] result = new TypeInfo[types.Length];
-			for (int i = 0; i < types.Length; ++i)
+			List<TypeInfo> results = new List<TypeInfo>();
+			foreach (var type in types)
 			{
-				var type = types[i];
-
+				if (type == null || type.GetCustomAttributes(typeof(SRHiddenAttribute), false).Length > 0)
+					continue;
+					
 				if (_typeInfoCache.TryGetValue(type, out var typeInfo))
 				{
-					result[i] = typeInfo;
+					results.Add(typeInfo);
 					continue;
 				}
 				
@@ -57,10 +58,10 @@ namespace SerializeReferenceEditor.Editor.Services
 				};
 
 				_typeInfoCache[type] = typeInfo;
-				result[i] = typeInfo;
+				results.Add(typeInfo);
 			}
 
-			return result;
+			return results.ToArray();
 		}
 		
 		public static TypeInfo[] GetTypeInfos(string typeName)
@@ -91,7 +92,13 @@ namespace SerializeReferenceEditor.Editor.Services
 			var typeClass = typeSplit[1];
 
 			result = Type.GetType(typeClass + ", " + typeAssembly);
-			_typeCache[typeName] = result;
+			
+			if (result != null && result.GetCustomAttributes(typeof(SRHiddenAttribute), false).Length > 0)
+				return null;
+			
+			if (result != null)
+				_typeCache[typeName] = result;
+				
 			return result;
 		}
 
