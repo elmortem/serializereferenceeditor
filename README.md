@@ -70,7 +70,18 @@ public class FloatData : AbstractData
 
 You can modify the display settings for the class name without specifying an attribute by navigating to `Edit -> Project Settings -> SREditor`.
 
+### SRHidden attribute
+
+Mark classes with this attribute to hide them from the type selection menu. Types with this attribute will not appear in the search tree.
+
 ## SRDrawer
+
+### SRDrawerOptions
+
+Provides configuration options for the SRDrawer:
+- `WithChild` - Controls whether child properties should be displayed
+- `ButtonTitle` - Controls whether the type name should be displayed on the button
+- `DisableExpand` - Disables the property expansion functionality
 
 ### SRDrawer.Draw
 
@@ -102,6 +113,14 @@ public class CustomDataDrawer : PropertyDrawer
     }
 }
 ```
+
+### SRDrawer.GetButtonWidth
+
+`SRDrawer.GetButtonWidth` method allows to get the width of the type selection button. Useful for custom property drawers when you need to adjust layout based on the button size.
+
+#### Method Parameters
+- `property`: Serialized property to calculate button width for
+- `options`: SRDrawerOptions to use for calculation
 
 ## Tools
 
