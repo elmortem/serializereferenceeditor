@@ -25,6 +25,12 @@ namespace SerializeReferenceEditor.Editor
 
 		private Type GetManagedReferenceFieldType(SerializedProperty property)
 		{
+			if (property == null || property.managedReferenceFieldTypename == null)
+			{
+				Debug.LogError($"Property '{property?.propertyPath}' has no managedReferenceFieldTypename");
+				return null;
+			}
+
 			string[] typeSplit = property.managedReferenceFieldTypename.Split(char.Parse(" "));
 			string typeAssembly = typeSplit[0];
 			string typeClass = typeSplit[1];
