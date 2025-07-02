@@ -6,7 +6,7 @@ using UnityEngine;
 namespace SerializeReferenceEditor.Editor.MissingTypesValidator
 {
     [CreateAssetMenu(fileName = "SRMissingTypesValidatorConfig",
-        menuName = "Tools/SREditor/SRMissingTypesValidatorConfig",
+        menuName = "SREditor/SRMissingTypesValidatorConfig",
         order = 0)]
     public class SRMissingTypesValidatorConfig : ScriptableObject
     {
