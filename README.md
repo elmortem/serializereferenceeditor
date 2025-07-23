@@ -160,6 +160,8 @@ Now Serialize Reference Editor can auto detect and handle SerializeReference obj
 
 [Georg Meyer](https://github.com/scho)
 
+[d4nilevi4](https://github.com/d4nilevi4)
+
 [https://www.markdowntopdf.com](https://www.markdowntopdf.com)
 
 
