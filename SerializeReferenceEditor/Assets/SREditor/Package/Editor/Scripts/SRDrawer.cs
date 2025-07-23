@@ -31,7 +31,7 @@ namespace SerializeReferenceEditor.Editor
 				return null;
 			}
 
-			string[] typeSplit = property.managedReferenceFieldTypename.Split(char.Parse(" "));
+			string[] typeSplit = property.managedReferenceFieldTypename.Split(new[] { ' ' }, 2);
 			string typeAssembly = typeSplit[0];
 			string typeClass = typeSplit[1];
 			return Type.GetType(typeClass + ", " + typeAssembly);
