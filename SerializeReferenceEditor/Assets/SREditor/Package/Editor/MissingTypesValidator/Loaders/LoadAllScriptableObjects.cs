@@ -7,6 +7,7 @@ namespace SerializeReferenceEditor.Editor.MissingTypesValidator.Loaders
 {
     [Serializable]
     [SRName("Load all ScriptableObjects")]
+    [Obsolete("LoadAllScriptableObjects is deprecated. Use Tools/SREditor/Log MissingTypes instead.")]
     public class LoadAllScriptableObjects : IAssetsLoader
     {
         public bool TryLoadAssetsForCheck(List<Object> assets)

@@ -7,6 +7,7 @@ using Object = UnityEngine.Object;
 namespace SerializeReferenceEditor.Editor.MissingTypesValidator.ReportFormats
 {
     [Serializable]
+    [Obsolete("UnityLogAssetMissingTypeReport is deprecated. Use Tools/SREditor/Log MissingTypes instead.")]
     public class UnityLogAssetMissingTypeReport : IAssetMissingTypeReport
     {
         private StringBuilder _stringBuilder = new();

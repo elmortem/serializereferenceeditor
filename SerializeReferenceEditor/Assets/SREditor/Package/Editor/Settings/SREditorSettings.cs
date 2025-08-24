@@ -23,6 +23,8 @@ namespace SerializeReferenceEditor.Editor.Settings
 		[SerializeField]
 		internal bool _formerlySerializedTypeOnAssetImport = true;
 		[SerializeField]
+		internal bool _clearMissingReferencesIfNoReplacement = false;
+		[SerializeField]
 		internal bool _doubleCleanOnEditorUpdate = true;
 		[SerializeField]
 		internal bool _doubleCleanOnUndoRedo = true;
@@ -30,16 +32,20 @@ namespace SerializeReferenceEditor.Editor.Settings
 		internal bool _doubleCleanOnAssetSave = true;
 		[SerializeField]
 		internal SRDuplicateMode _duplicateMode = SRDuplicateMode.Default;
+		[SerializeField]
+		internal string _missingTypesAssetFilter = "t:Object";
 		
 		public ShowNameType ShowNameType => _showNameType;
 		public char[] NameSeparators => _nameSeparators;
 		public bool FormerlySerializedTypeOnSceneSave => _formerlySerializedTypeOnSceneSave;
 		public bool FormerlySerializedTypeOnAssetSelect => _formerlySerializedTypeOnAssetSelect;
 		public bool FormerlySerializedTypeOnAssetImport => _formerlySerializedTypeOnAssetImport;
+		public bool ClearMissingReferencesIfNoReplacement => _clearMissingReferencesIfNoReplacement;
 		public bool DoubleCleanOnEditorUpdate => _doubleCleanOnEditorUpdate;
 		public bool DoubleCleanOnUndoRedo => _doubleCleanOnUndoRedo;
 		public bool DoubleCleanOnAssetSave => _doubleCleanOnAssetSave;
 		public SRDuplicateMode DuplicateMode => _duplicateMode;
+		public string MissingTypesAssetFilter => _missingTypesAssetFilter;
 		
 		[InitializeOnLoadMethod]
 		static void Initialize()

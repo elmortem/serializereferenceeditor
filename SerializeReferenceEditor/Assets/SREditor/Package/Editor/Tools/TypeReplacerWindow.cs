@@ -4,27 +4,26 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
+using SerializeReferenceEditor.Editor.Processing.TypeReplace;
 using UnityEditor.Experimental.GraphView;
 
-namespace SerializeReferenceEditor.Editor.ClassReplacer
+namespace SerializeReferenceEditor.Editor.Tools
 {
-	public class SRClassReplacer : EditorWindow
+	public class TypeReplacerWindow : EditorWindow
 	{
 		private string _oldTypeFullName;
 		private string _newTypeFullName;
 		private Vector2 _scrollPosition;
 		private string _statusMessage = "";
 
-		[MenuItem("Tools/SREditor/Class Replacer")]
+		[MenuItem("Tools/SREditor/Class Replacer Window")]
 		public static void ShowWindow()
 		{
-			GetWindow<SRClassReplacer>("SR Class Replacer");
+			GetWindow<TypeReplacerWindow>("SR Class Replacer");
 		}
 
 		private void OnGUI()
 		{
-			GUILayout.Label("SerializeReference Class Replacer", EditorStyles.boldLabel);
-
 			using (var scrollView = new EditorGUILayout.ScrollViewScope(_scrollPosition))
 			{
 				_scrollPosition = scrollView.scrollPosition;
@@ -212,7 +211,7 @@ namespace SerializeReferenceEditor.Editor.ClassReplacer
 
 		private bool ProcessAsset(string path, string oldTypeFullName, string newTypeFullName)
 		{
-			return TypeReplacer.ReplaceTypeInFile(path, oldTypeFullName, newTypeFullName);
+			return TypeReplaceHelper.ReplaceTypeInFile(path, oldTypeFullName, newTypeFullName);
 		}
 	}
 }

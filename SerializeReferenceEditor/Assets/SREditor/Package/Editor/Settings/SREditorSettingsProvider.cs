@@ -34,10 +34,11 @@ namespace SerializeReferenceEditor.Editor.Settings
 						
 						EditorGUILayout.Space();
 						EditorGUILayout.LabelField("Formerly Serialized Type", EditorStyles.boldLabel);
-
+					
 						DrawCheckbox(settings, nameof(SREditorSettings._formerlySerializedTypeOnSceneSave));
 						DrawCheckbox(settings, nameof(SREditorSettings._formerlySerializedTypeOnAssetSelect));
 						DrawCheckbox(settings, nameof(SREditorSettings._formerlySerializedTypeOnAssetImport));
+						DrawCheckbox(settings, nameof(SREditorSettings._clearMissingReferencesIfNoReplacement));
 						
 						EditorGUILayout.Space();
 						EditorGUILayout.LabelField("Double Clean", EditorStyles.boldLabel);
@@ -48,7 +49,11 @@ namespace SerializeReferenceEditor.Editor.Settings
 
 						EditorGUILayout.Space();
 						EditorGUILayout.LabelField("Duplicate Handling", EditorStyles.boldLabel);
-						EditorGUILayout.PropertyField(settings.FindProperty(nameof(SREditorSettings._duplicateMode)));
+						EditorGUILayout.PropertyField(settings.FindProperty("_duplicateMode"), new GUIContent("Mode", "Duplicate mode"));
+
+						EditorGUILayout.Space();
+						EditorGUILayout.LabelField("Tools", EditorStyles.boldLabel);
+						EditorGUILayout.PropertyField(settings.FindProperty("_missingTypesAssetFilter"), new GUIContent("Missing Types Filter", "Filter passed to AssetDatabase.FindAssets"));
 
 						if (!changeCheck.changed)
 							return;

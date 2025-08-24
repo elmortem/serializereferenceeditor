@@ -1,9 +1,9 @@
 using System.IO;
 using UnityEditor;
 
-namespace SerializeReferenceEditor.Editor.ClassReplacer
+namespace SerializeReferenceEditor.Editor.Processing.TypeReplace
 {
-	public static class TypeReplacer
+	public static class TypeReplaceHelper
 	{
 		public static bool ReplaceTypeInFile(string path, string oldTypePattern, string newTypePattern)
 		{
