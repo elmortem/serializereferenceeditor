@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace SerializeReferenceEditor.Editor.Processing.DoubleCleaner
+namespace SerializeReferenceEditor.Editor.Processing.DoubleClean
 {
     public static class SRDuplicateCleaner
     {

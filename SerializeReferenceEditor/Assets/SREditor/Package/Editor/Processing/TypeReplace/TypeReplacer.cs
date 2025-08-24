@@ -34,7 +34,7 @@ namespace SerializeReferenceEditor.Editor.Processing.TypeReplace
 			{
 				if (obj is GameObject gameObject)
 				{
-					foreach (var component in gameObject.GetComponentsInChildren<Component>(true))
+					foreach (var component in gameObject.GetComponentsInChildren<MonoBehaviour>(true))
 					{
 						if (component == null) continue;
 						if (SerializationUtility.HasManagedReferencesWithMissingTypes(component))
@@ -44,11 +44,11 @@ namespace SerializeReferenceEditor.Editor.Processing.TypeReplace
 						}
 					}
 				}
-				else
+				else if (obj is ScriptableObject scriptable)
 				{
-					if (SerializationUtility.HasManagedReferencesWithMissingTypes(obj))
+					if (SerializationUtility.HasManagedReferencesWithMissingTypes(scriptable))
 					{
-						SerializationUtility.ClearAllManagedReferencesWithMissingTypes(obj);
+						SerializationUtility.ClearAllManagedReferencesWithMissingTypes(scriptable);
 						clearedMissingReferences = true;
 					}
 				}

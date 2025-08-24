@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using SerializeReferenceEditor.Editor.Processing.DoubleCleaner;
+using SerializeReferenceEditor.Editor.Processing.DoubleClean;
 using SerializeReferenceEditor.Editor.Processing.TypeReplace;
 using SerializeReferenceEditor.Editor.Settings;
 using UnityEditor;
