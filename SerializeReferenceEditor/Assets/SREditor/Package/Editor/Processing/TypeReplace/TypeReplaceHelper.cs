@@ -9,6 +9,9 @@ namespace SerializeReferenceEditor.Editor.Processing.TypeReplace
 		{
 			if (AssetDatabase.IsValidFolder(path))
 				return false;
+
+			if (!File.Exists(path))
+				return false;
 			
 			string content = File.ReadAllText(path);
 			bool wasModified = false;

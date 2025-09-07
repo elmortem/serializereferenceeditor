@@ -31,25 +31,31 @@ namespace SerializeReferenceEditor.Editor.Settings
 					{
 						EditorGUILayout.PropertyField(settings.FindProperty(nameof(SREditorSettings._showNameType)));
 						EditorGUILayout.PropertyField(settings.FindProperty(nameof(SREditorSettings._nameSeparators)));
-						
+
 						EditorGUILayout.Space();
-						EditorGUILayout.LabelField("Formerly Serialized Type", EditorStyles.boldLabel);
-					
-						DrawCheckbox(settings, nameof(SREditorSettings._formerlySerializedTypeOnSceneSave));
-						DrawCheckbox(settings, nameof(SREditorSettings._formerlySerializedTypeOnAssetSelect));
-						DrawCheckbox(settings, nameof(SREditorSettings._formerlySerializedTypeOnAssetImport));
-						DrawCheckbox(settings, nameof(SREditorSettings._clearMissingReferencesIfNoReplacement));
-						
+						EditorGUILayout.LabelField("Auto Processing Triggers", EditorStyles.boldLabel);
+						EditorGUILayout.PropertyField(settings.FindProperty("_formerlySerializedTypeOnAssetImport"), new GUIContent("On Asset Import", "Process assets when they are imported"));
+						EditorGUILayout.PropertyField(settings.FindProperty("_formerlySerializedTypeOnAssetSelect"), new GUIContent("On Project Asset Select", "Process only when selecting root assets in the Project window"));
+						EditorGUILayout.PropertyField(settings.FindProperty("_formerlySerializedTypeOnSceneSave"), new GUIContent("On Scene Save", "Process scene roots when the scene is saved"));
+						EditorGUILayout.PropertyField(settings.FindProperty("_processScenesOnOpen"), new GUIContent("On Scene Open", "Enqueue scene roots for processing when a scene is opened"));
+
 						EditorGUILayout.Space();
-						EditorGUILayout.LabelField("Double Clean", EditorStyles.boldLabel);
-						
-						DrawCheckbox(settings, nameof(SREditorSettings._doubleCleanOnEditorUpdate));
-						DrawCheckbox(settings, nameof(SREditorSettings._doubleCleanOnUndoRedo));
-						DrawCheckbox(settings, nameof(SREditorSettings._doubleCleanOnAssetSave));
+						EditorGUILayout.LabelField("Processing", EditorStyles.boldLabel);
+						EditorGUILayout.PropertyField(settings.FindProperty("_processingBatchSize"), new GUIContent("Batch Size", "How many assets/objects to process per tick"));
+
+						EditorGUILayout.Space();
+						EditorGUILayout.LabelField("Type Replacement & Cleanup", EditorStyles.boldLabel);
+						EditorGUILayout.PropertyField(settings.FindProperty("_clearMissingReferencesIfNoReplacement"), new GUIContent("Clear Missing Managed References", "If no type replacement occurred, clear missing managed references on objects"));
 
 						EditorGUILayout.Space();
 						EditorGUILayout.LabelField("Duplicate Handling", EditorStyles.boldLabel);
-						EditorGUILayout.PropertyField(settings.FindProperty("_duplicateMode"), new GUIContent("Mode", "Duplicate mode"));
+						EditorGUILayout.PropertyField(settings.FindProperty("_duplicateMode"), new GUIContent("Mode", "How to handle duplicate managed references"));
+
+						EditorGUILayout.Space();
+						EditorGUILayout.LabelField("Change Detection Sources", EditorStyles.boldLabel);
+						EditorGUILayout.PropertyField(settings.FindProperty("_doubleCleanOnEditorUpdate"), new GUIContent("On Editor Update", "Detect changes on selected objects during editor update"));
+						EditorGUILayout.PropertyField(settings.FindProperty("_doubleCleanOnUndoRedo"), new GUIContent("On Undo/Redo", "Detect changes via Undo/Redo operations"));
+						EditorGUILayout.PropertyField(settings.FindProperty("_doubleCleanOnAssetSave"), new GUIContent("On Asset Save", "Detect changes when assets are saved"));
 
 						EditorGUILayout.Space();
 						EditorGUILayout.LabelField("Tools", EditorStyles.boldLabel);

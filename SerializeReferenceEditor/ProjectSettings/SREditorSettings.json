@@ -7,8 +7,12 @@
     "_formerlySerializedTypeOnSceneSave": true,
     "_formerlySerializedTypeOnAssetSelect": true,
     "_formerlySerializedTypeOnAssetImport": true,
+    "_clearMissingReferencesIfNoReplacement": true,
     "_doubleCleanOnEditorUpdate": false,
     "_doubleCleanOnUndoRedo": true,
     "_doubleCleanOnAssetSave": true,
-    "_duplicateMode": 0
+    "_duplicateMode": 0,
+    "_missingTypesAssetFilter": "t:Object",
+    "_processingBatchSize": 2,
+    "_processScenesOnOpen": false
 }

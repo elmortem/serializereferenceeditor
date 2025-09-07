@@ -34,6 +34,10 @@ namespace SerializeReferenceEditor.Editor.Settings
 		internal SRDuplicateMode _duplicateMode = SRDuplicateMode.Default;
 		[SerializeField]
 		internal string _missingTypesAssetFilter = "t:Object";
+		[SerializeField]
+		internal int _processingBatchSize = 2;
+		[SerializeField]
+		internal bool _processScenesOnOpen = false;
 		
 		public ShowNameType ShowNameType => _showNameType;
 		public char[] NameSeparators => _nameSeparators;
@@ -46,6 +50,8 @@ namespace SerializeReferenceEditor.Editor.Settings
 		public bool DoubleCleanOnAssetSave => _doubleCleanOnAssetSave;
 		public SRDuplicateMode DuplicateMode => _duplicateMode;
 		public string MissingTypesAssetFilter => _missingTypesAssetFilter;
+		public int ProcessingBatchSize => _processingBatchSize > 0 ? _processingBatchSize : 1;
+		public bool ProcessScenesOnOpen => _processScenesOnOpen;
 		
 		[InitializeOnLoadMethod]
 		static void Initialize()

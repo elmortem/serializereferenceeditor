@@ -10,7 +10,7 @@ namespace SerializeReferenceEditor.Editor.MissingTypesValidator
     [Obsolete("SRMissingTypesValidator is deprecated. Use Tools/SREditor/Log MissingTypes instead.")]
     public class SRMissingTypesValidator
     {
-        [MenuItem("Tools/SREditor/[Deprecated] Check MissingTypes")]
+        [MenuItem("Tools/SREditor/Check MissingTypes [Deprecated]")]
         public static void Check()
         {
             var configs = Resources.FindObjectsOfTypeAll<SRMissingTypesValidatorConfig>();

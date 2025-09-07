@@ -6,7 +6,7 @@ using UnityEngine;
 namespace SerializeReferenceEditor.Editor.MissingTypesValidator
 {
     [CreateAssetMenu(fileName = "SRMissingTypesValidatorConfig",
-        menuName = "SREditor/[Deprecated] SRMissingTypesValidatorConfig",
+        menuName = "SREditor/SRMissingTypesValidatorConfig [Deprecated]",
         order = 0)]
     [Obsolete("SRMissingTypesValidatorConfig is deprecated. Use Tools/SREditor/Log MissingTypes instead.")]
     public class SRMissingTypesValidatorConfig : ScriptableObject
