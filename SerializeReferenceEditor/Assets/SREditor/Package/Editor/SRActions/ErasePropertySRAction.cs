@@ -4,10 +4,10 @@ namespace SerializeReferenceEditor.Editor.SRActions
 {
     public class ErasePropertySRAction : BaseSRAction
     {
-        public ErasePropertySRAction(SerializedProperty currentProperty, SerializedProperty parentProperty)
-            : base(currentProperty, parentProperty)
+        public ErasePropertySRAction(SerializedProperty currentProperty)
+            : base(currentProperty)
         {
-            
+
         }
 
         protected override void DoApply()

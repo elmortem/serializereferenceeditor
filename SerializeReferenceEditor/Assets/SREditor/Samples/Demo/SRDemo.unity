@@ -459,6 +459,42 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5370488343339443315, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: managedReferences[-2]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5370488343339443315, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: DataOneTwoArray.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5370488343339443315, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: DataOneTwoArray.Array.data[2]
+      value: 4416823453161095171
+      objectReference: {fileID: 0}
+    - target: {fileID: 5370488343339443315, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: managedReferences[4416823453161095168]
+      value: SRDemo Demo.StringData
+      objectReference: {fileID: 0}
+    - target: {fileID: 5370488343339443315, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: managedReferences[4416823453161095170]
+      value: SRDemo Demo.IntegerData
+      objectReference: {fileID: 0}
+    - target: {fileID: 5370488343339443315, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: managedReferences[4416823453161095171]
+      value: SRDemo Demo.StringData
+      objectReference: {fileID: 0}
+    - target: {fileID: 5370488343339443315, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: managedReferences[4416823453161095168].Str
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5370488343339443315, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: managedReferences[4416823453161095170].Int
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5370488343339443315, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: managedReferences[4416823453161095171].Str
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5370488343339443315, guid: 2cfca8517d037415ba308930afe49802, type: 3}
       propertyPath: managedReferences[8191843295340527633].Int
       value: 83
       objectReference: {fileID: 0}
