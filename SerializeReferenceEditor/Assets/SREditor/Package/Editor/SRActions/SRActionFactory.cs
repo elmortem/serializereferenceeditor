@@ -20,5 +20,14 @@ namespace SerializeReferenceEditor.Editor.SRActions
 
         public ErasePropertySRAction EraseBuild()
             => new ErasePropertySRAction(_currentProperty);
+
+        public CopyPropertySRAction CopyBuild()
+            => new CopyPropertySRAction(_currentProperty);
+
+        public PastePropertySRAction PasteBuild()
+            => new PastePropertySRAction(_currentProperty);
+
+        public CutPropertySRAction CutBuild()
+            => new CutPropertySRAction(_currentProperty);
     }
 }
