@@ -40,6 +40,21 @@ namespace SerializeReferenceEditor.Editor.Drawers
                     userData = srActionFactory.EraseBuild(),
                     level = 1
                 },
+                new(new GUIContent("Copy"))
+                {
+                    userData = srActionFactory.CopyBuild(),
+                    level = 1
+                },
+                new(new GUIContent("Paste"))
+                {
+                    userData = srActionFactory.PasteBuild(),
+                    level = 1
+                },
+                new(new GUIContent("Cut"))
+                {
+                    userData = srActionFactory.CutBuild(),
+                    level = 1
+                },
             };
             list.AddRange(srTypeTreeFactory.MakeTypesTree(srActionFactory));
 
