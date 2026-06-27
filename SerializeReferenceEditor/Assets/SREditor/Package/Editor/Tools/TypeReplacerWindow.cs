@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using System;
+using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
@@ -211,7 +212,18 @@ namespace SerializeReferenceEditor.Editor.Tools
 
 		private bool ProcessAsset(string path, string oldTypeFullName, string newTypeFullName)
 		{
-			return TypeReplaceHelper.ReplaceTypeInFile(path, oldTypeFullName, newTypeFullName);
+			if (!File.Exists(path))
+				return false;
+
+			string content = File.ReadAllText(path);
+			var pattern = SRReplacementPattern.Parse(oldTypeFullName, newTypeFullName);
+			content = TypeReplaceHelper.ApplyReplacement(content, pattern, out bool wasModified);
+			if (wasModified)
+			{
+				File.WriteAllText(path, content);
+			}
+
+			return wasModified;
 		}
 	}
 }

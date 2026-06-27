@@ -37,6 +37,12 @@ namespace SerializeReferenceEditor.Editor.Settings
 		[SerializeField]
 		internal int _processingBatchSize = 2;
 		[SerializeField]
+		internal int _processingFrameBudgetMs = 8;
+		[SerializeField]
+		internal int _processingMaxThreads = 4;
+		[SerializeField]
+		internal int _changeDetectorPollIntervalMs = 200;
+		[SerializeField]
 		internal bool _processScenesOnOpen = false;
 		
 		public ShowNameType ShowNameType => _showNameType;
@@ -51,6 +57,9 @@ namespace SerializeReferenceEditor.Editor.Settings
 		public SRDuplicateMode DuplicateMode => _duplicateMode;
 		public string MissingTypesAssetFilter => _missingTypesAssetFilter;
 		public int ProcessingBatchSize => _processingBatchSize > 0 ? _processingBatchSize : 1;
+		public int ProcessingFrameBudgetMs => _processingFrameBudgetMs > 0 ? _processingFrameBudgetMs : 8;
+		public int ProcessingMaxThreads => _processingMaxThreads > 0 ? _processingMaxThreads : 1;
+		public int ChangeDetectorPollIntervalMs => _changeDetectorPollIntervalMs >= 0 ? _changeDetectorPollIntervalMs : 0;
 		public bool ProcessScenesOnOpen => _processScenesOnOpen;
 		
 		[InitializeOnLoadMethod]

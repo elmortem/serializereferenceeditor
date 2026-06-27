@@ -42,6 +42,8 @@ namespace SerializeReferenceEditor.Editor.Settings
 						EditorGUILayout.Space();
 						EditorGUILayout.LabelField("Processing", EditorStyles.boldLabel);
 						EditorGUILayout.PropertyField(settings.FindProperty("_processingBatchSize"), new GUIContent("Batch Size", "How many assets/objects to process per tick"));
+						EditorGUILayout.PropertyField(settings.FindProperty("_processingFrameBudgetMs"), new GUIContent("Frame Budget (ms)", "Per-frame time budget for the main-thread apply stage"));
+						EditorGUILayout.PropertyField(settings.FindProperty("_processingMaxThreads"), new GUIContent("Max Scan Threads", "Max worker threads for the background text-replacement scan"));
 
 						EditorGUILayout.Space();
 						EditorGUILayout.LabelField("Type Replacement & Cleanup", EditorStyles.boldLabel);
@@ -56,6 +58,7 @@ namespace SerializeReferenceEditor.Editor.Settings
 						EditorGUILayout.PropertyField(settings.FindProperty("_doubleCleanOnEditorUpdate"), new GUIContent("On Editor Update", "Detect changes on selected objects during editor update"));
 						EditorGUILayout.PropertyField(settings.FindProperty("_doubleCleanOnUndoRedo"), new GUIContent("On Undo/Redo", "Detect changes via Undo/Redo operations"));
 						EditorGUILayout.PropertyField(settings.FindProperty("_doubleCleanOnAssetSave"), new GUIContent("On Asset Save", "Detect changes when assets are saved"));
+						EditorGUILayout.PropertyField(settings.FindProperty("_changeDetectorPollIntervalMs"), new GUIContent("Editor Update Poll (ms)", "Throttle interval for change detection on editor update"));
 
 						EditorGUILayout.Space();
 						EditorGUILayout.LabelField("Tools", EditorStyles.boldLabel);

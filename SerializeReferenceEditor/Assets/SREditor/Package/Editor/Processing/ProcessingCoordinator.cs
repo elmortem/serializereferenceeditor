@@ -1,12 +1,19 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using SerializeReferenceEditor.Editor.Processing.DoubleClean;
 using SerializeReferenceEditor.Editor.Processing.TypeReplace;
 using SerializeReferenceEditor.Editor.Settings;
+using SerializeReferenceEditor.Services;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Debug = UnityEngine.Debug;
 using Object = UnityEngine.Object;
 
 namespace SerializeReferenceEditor.Editor.Processing
@@ -17,8 +24,18 @@ namespace SerializeReferenceEditor.Editor.Processing
 		private static readonly HashSet<Object> PendingSceneObjects = new();
 		private static readonly HashSet<string> InFlightImports = new();
 
-		private static bool _processingScheduled;
-		private static bool _isProcessing;
+		private static readonly List<SRFileScanResult> PendingWrites = new();
+		private static readonly List<string> PendingObjBranch = new();
+		private static readonly List<string> ReimportQueue = new();
+		private static readonly List<Object> SceneApplyQueue = new();
+		private static readonly List<Object> DirtyAssets = new();
+
+		private static SRProcessingState _state = SRProcessingState.Idle;
+		private static bool _pumpSubscribed;
+
+		private static CancellationTokenSource _scanCts;
+		private static Task _scanTask;
+		private static ConcurrentQueue<SRFileScanResult> _scanResults;
 
 		[InitializeOnLoadMethod]
 		private static void Initialize()
@@ -34,6 +51,12 @@ namespace SerializeReferenceEditor.Editor.Processing
 
 			AssetChangeDetector.ChangeEvent -= OnAssetChanged;
 			AssetChangeDetector.ChangeEvent += OnAssetChanged;
+
+			AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
+			AssemblyReloadEvents.beforeAssemblyReload += OnBeforeAssemblyReload;
+
+			EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+			EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
 		}
 
 		private static SREditorSettings Settings => SREditorSettings.GetOrCreateSettings();
@@ -42,24 +65,21 @@ namespace SerializeReferenceEditor.Editor.Processing
 		{
 			if (string.IsNullOrEmpty(path))
 				return false;
-			return path.EndsWith(".prefab", System.StringComparison.OrdinalIgnoreCase)
-				   || path.EndsWith(".unity", System.StringComparison.OrdinalIgnoreCase)
-				   || path.EndsWith(".asset", System.StringComparison.OrdinalIgnoreCase);
+
+			return path.EndsWith(".prefab", StringComparison.OrdinalIgnoreCase)
+				   || path.EndsWith(".unity", StringComparison.OrdinalIgnoreCase)
+				   || path.EndsWith(".asset", StringComparison.OrdinalIgnoreCase);
 		}
 
-		static void OnPostprocessAllAssets(
-			string[] importedAssets,
-			string[] deletedAssets,
-			string[] movedAssets,
-			string[] movedFromAssetPaths)
+		static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
 		{
 			if (deletedAssets != null)
 			{
 				foreach (var p in deletedAssets)
 				{
-					if (!IsProcessableAssetPath(p)) 
+					if (!IsProcessableAssetPath(p))
 						continue;
-					
+
 					PendingAssetPaths.Remove(p);
 					InFlightImports.Remove(p);
 				}
@@ -69,9 +89,9 @@ namespace SerializeReferenceEditor.Editor.Processing
 			{
 				foreach (var p in movedFromAssetPaths)
 				{
-					if (!IsProcessableAssetPath(p)) 
+					if (!IsProcessableAssetPath(p))
 						continue;
-					
+
 					PendingAssetPaths.Remove(p);
 					InFlightImports.Remove(p);
 				}
@@ -82,22 +102,17 @@ namespace SerializeReferenceEditor.Editor.Processing
 
 			foreach (var path in importedAssets)
 			{
-				if (string.IsNullOrEmpty(path))
-					continue;
 				if (!IsProcessableAssetPath(path))
 					continue;
-				
+
 				if (InFlightImports.Remove(path))
 					continue;
 
 				EnqueueAssetPath(path);
 			}
 
-			// Treat moved assets as newly imported at their new path
 			foreach (var path in movedAssets)
 			{
-				if (string.IsNullOrEmpty(path))
-					continue;
 				if (!IsProcessableAssetPath(path))
 					continue;
 
@@ -110,17 +125,41 @@ namespace SerializeReferenceEditor.Editor.Processing
 
 		private static void OnAssetChanged(Object changedObject)
 		{
-			if (_isProcessing)
+			if (_state == SRProcessingState.Applying)
 				return;
 
 			if (changedObject == null)
 				return;
 
 			var assetPath = AssetDatabase.GetAssetPath(changedObject);
-			if (!IsProcessableAssetPath(assetPath))
+			if (IsProcessableAssetPath(assetPath))
+			{
+				EnqueueAssetPath(assetPath);
 				return;
-			
-			EnqueueAssetPath(assetPath);
+			}
+
+			var root = ResolveSceneRoot(changedObject);
+			if (root != null)
+			{
+				SRSceneDirtyTracker.MarkDirty(root);
+			}
+		}
+
+		private static GameObject ResolveSceneRoot(Object obj)
+		{
+			var go = obj as GameObject;
+			if (go == null && obj is Component component)
+			{
+				go = component.gameObject;
+			}
+
+			if (go == null)
+				return null;
+
+			if (!go.scene.IsValid())
+				return null;
+
+			return go.transform.root.gameObject;
 		}
 
 		private static void OnSelectionChanged()
@@ -135,12 +174,48 @@ namespace SerializeReferenceEditor.Editor.Processing
 
 				var path = AssetDatabase.GetAssetPath(obj);
 				if (!IsProcessableAssetPath(path))
-					continue; // ignore assets we don't process
+					continue;
 
 				if (!AssetDatabase.IsMainAsset(obj))
-					continue; // ignore sub-assets or non-root selections
+					continue;
 
 				EnqueueAssetPath(path);
+			}
+		}
+
+		private static void OnSceneOpened(Scene scene, OpenSceneMode mode)
+		{
+			SRSceneDirtyTracker.Reset(scene.path);
+
+			if (!Settings.ProcessScenesOnOpen)
+				return;
+
+			var roots = scene.GetRootGameObjects();
+			foreach (var go in roots)
+			{
+				if (go == null)
+					continue;
+
+				EnqueueSceneObject(go);
+			}
+		}
+
+		private static void EnqueueAssetPath(string path)
+		{
+			if (PendingAssetPaths.Add(path))
+			{
+				EnsurePump();
+			}
+		}
+
+		private static void EnqueueSceneObject(Object obj)
+		{
+			if (obj == null)
+				return;
+
+			if (PendingSceneObjects.Add(obj))
+			{
+				EnsurePump();
 			}
 		}
 
@@ -149,199 +224,339 @@ namespace SerializeReferenceEditor.Editor.Processing
 			if (!Settings.FormerlySerializedTypeOnSceneSave)
 				return;
 
+			bool processAll = SRSceneDirtyTracker.ShouldProcessAll(path);
 			var roots = scene.GetRootGameObjects();
 			bool anyChanged = false;
+
 			foreach (var go in roots)
 			{
-				bool modified = TypeReplacer.TryUpgradeAsset(string.Empty, go, out bool clearedMissing);
-				modified |= SRDuplicateCleaner.TryCleanupObject(go, Settings.DuplicateMode);
-				anyChanged |= modified | clearedMissing;
+				if (go == null)
+					continue;
+
+				if (!processAll && !SRSceneDirtyTracker.IsRootDirty(path, go.GetInstanceID()))
+					continue;
+
+				TypeReplacer.TryClearMissingReferences(go, out bool clearedMissing);
+				bool cleaned = SRDuplicateCleaner.TryCleanupObject(go, Settings.DuplicateMode);
+				anyChanged |= clearedMissing | cleaned;
 			}
 
 			if (anyChanged)
 			{
 				EditorSceneManager.MarkSceneDirty(scene);
 			}
+
+			SRSceneDirtyTracker.OnProcessed(path);
 		}
 
-		private static void OnSceneOpened(Scene scene, OpenSceneMode mode)
+		private static void EnsurePump()
 		{
-			if (!Settings.ProcessScenesOnOpen)
+			if (_pumpSubscribed)
 				return;
 
-			var roots = scene.GetRootGameObjects();
-			foreach (var go in roots)
+			_pumpSubscribed = true;
+			EditorApplication.update += Pump;
+		}
+
+		private static void UnsubscribePump()
+		{
+			if (!_pumpSubscribed)
+				return;
+
+			_pumpSubscribed = false;
+			EditorApplication.update -= Pump;
+		}
+
+		private static void Pump()
+		{
+			if (EditorApplication.isPlayingOrWillChangePlaymode)
+				return;
+
+			switch (_state)
 			{
-				if (go == null) 
-					continue;
-				
-				EnqueueSceneObject(go);
+				case SRProcessingState.Idle:
+					PumpIdle();
+					break;
+
+				case SRProcessingState.Scanning:
+					if (_scanTask != null && _scanTask.IsCompleted)
+					{
+						BeginApply();
+					}
+					break;
+
+				case SRProcessingState.Applying:
+					StepApply();
+					break;
 			}
 		}
 
-		private static void EnqueueAssetPath(string path)
+		private static void PumpIdle()
 		{
-			if (PendingAssetPaths.Add(path))
-				ScheduleProcessing();
-		}
-
-		private static void EnqueueSceneObject(Object obj)
-		{
-			if (obj == null)
-				return;
-			if (PendingSceneObjects.Add(obj))
-				ScheduleProcessing();
-		}
-
-		private static void ScheduleProcessing()
-		{
-			if (_processingScheduled)
-				return;
-			_processingScheduled = true;
-			EditorApplication.delayCall += ProcessBatch;
-		}
-
-		private static void ProcessBatch()
-		{
-			_processingScheduled = false;
-			if (_isProcessing)
-				return;
-			_isProcessing = true;
-
-			try
+			if (PendingAssetPaths.Count > 0)
 			{
-				int batchSize = System.Math.Max(1, Settings.ProcessingBatchSize);
+				StartScan();
+				return;
+			}
 
-				// Take a batch of asset paths
-				var paths = new List<string>(batchSize);
-				using (var enumerator = PendingAssetPaths.GetEnumerator())
-				{
-					while (paths.Count < batchSize && enumerator.MoveNext())
-					{
-						var p = enumerator.Current;
-						if (!string.IsNullOrEmpty(p))
-							paths.Add(p);
-					}
-				}
-				// Remove taken items from the pending set
+			if (PendingSceneObjects.Count > 0)
+			{
+				BeginApply();
+				return;
+			}
+
+			UnsubscribePump();
+		}
+
+		private static List<SRReplacementPattern> SnapshotPatterns()
+		{
+			var list = new List<SRReplacementPattern>();
+			foreach (var (oldAssembly, oldType, newType) in SRFormerlyTypeCache.GetAllReplacements())
+			{
+				var oldTypePattern = string.IsNullOrEmpty(oldAssembly) ? oldType : $"{oldAssembly}, {oldType}";
+				var newAssembly = newType.Assembly.GetName().Name;
+				var newTypePattern = string.IsNullOrEmpty(newAssembly) ? newType.FullName : $"{newAssembly}, {newType.FullName}";
+				list.Add(SRReplacementPattern.Parse(oldTypePattern, newTypePattern));
+			}
+
+			return list;
+		}
+
+		private static void StartScan()
+		{
+			var patterns = SnapshotPatterns();
+			var paths = new List<string>(PendingAssetPaths);
+			PendingAssetPaths.Clear();
+
+			if (patterns.Count == 0)
+			{
 				foreach (var p in paths)
-					PendingAssetPaths.Remove(p);
-
-				// Take a batch of scene objects (remaining budget)
-				int remainingBudget = System.Math.Max(0, batchSize - paths.Count);
-				var sceneObjects = new List<Object>(remainingBudget);
-				using (var enumerator = PendingSceneObjects.GetEnumerator())
 				{
-					while (sceneObjects.Count < remainingBudget && enumerator.MoveNext())
-					{
-						var o = enumerator.Current;
-						if (o != null)
-							sceneObjects.Add(o);
-					}
-				}
-				foreach (var o in sceneObjects)
-					PendingSceneObjects.Remove(o);
-
-				var reimportPaths = new HashSet<string>();
-				var dirtyAssets = new HashSet<Object>();
-
-				foreach (var path in paths)
-				{
-					// 1) Try text-based replacement without loading asset
-					bool modified = TypeReplacer.TryUpgradeAsset(path, null, out bool _);
-
-					bool clearedMissing = false;
-					bool cleaned = false;
-					Object loadedAsset = null;
-
-					// 2) Only if nothing changed by text pass, optionally load and process object
-					bool wantClearMissing = Settings.ClearMissingReferencesIfNoReplacement;
-					bool wantDuplicateClean = Settings.DuplicateMode != SerializeReferenceEditor.Editor.Settings.SRDuplicateMode.Default;
-					if (!modified && (wantClearMissing || wantDuplicateClean))
-					{
-						loadedAsset = AssetDatabase.LoadAssetAtPath<Object>(path);
-						if (loadedAsset != null)
-						{
-							if (wantDuplicateClean)
-							{
-								cleaned = SRDuplicateCleaner.TryCleanupObject(loadedAsset, Settings.DuplicateMode);
-							}
-
-							if (wantClearMissing)
-							{
-								// Use empty assetPath to only clear missing refs without re-running text replacement
-								bool changedByClear = TypeReplacer.TryUpgradeAsset(string.Empty, loadedAsset, out bool cleared);
-								clearedMissing = cleared;
-								modified |= changedByClear;
-							}
-						}
-					}
-
-					if (modified && !string.IsNullOrEmpty(path))
-					{
-						reimportPaths.Add(path);
-					}
-
-					if (loadedAsset != null && (clearedMissing || cleaned))
-					{
-						EditorUtility.SetDirty(loadedAsset);
-						dirtyAssets.Add(loadedAsset);
-					}
+					PendingObjBranch.Add(p);
 				}
 
-				foreach (var obj in sceneObjects)
+				_scanResults = null;
+				BeginApply();
+				return;
+			}
+
+			_scanResults = new ConcurrentQueue<SRFileScanResult>();
+			_scanCts = new CancellationTokenSource();
+			var token = _scanCts.Token;
+			var results = _scanResults;
+			int maxThreads = Settings.ProcessingMaxThreads;
+
+			_scanTask = Task.Run(() =>
+			{
+				var options = new ParallelOptions { MaxDegreeOfParallelism = maxThreads, CancellationToken = token };
+				try
 				{
-					if (obj == null) continue;
-
-					string scenePath = string.Empty;
-					if (obj is Component c && c.gameObject.scene.IsValid())
-						scenePath = c.gameObject.scene.path;
-					else if (obj is GameObject go && go.scene.IsValid())
-						scenePath = go.scene.path;
-
-					bool modified = TypeReplacer.TryUpgradeAsset(string.Empty, obj, out bool clearedMissing);
-					bool cleaned = SRDuplicateCleaner.TryCleanupObject(obj, Settings.DuplicateMode);
-
-					if ((modified || clearedMissing || cleaned) && !string.IsNullOrEmpty(scenePath))
+					Parallel.ForEach(paths, options, p =>
 					{
-						var scene = SceneManager.GetSceneByPath(scenePath);
-						if (scene.IsValid())
-							EditorSceneManager.MarkSceneDirty(scene);
+						token.ThrowIfCancellationRequested();
+						results.Enqueue(SRFileScanner.Scan(p, patterns));
+					});
+				}
+				catch (OperationCanceledException)
+				{
+				}
+				catch (Exception e)
+				{
+					Debug.LogError($"SRProcessingCoordinator scan error: {e}");
+				}
+			}, token);
+
+			_state = SRProcessingState.Scanning;
+		}
+
+		private static void BeginApply()
+		{
+			if (_scanResults != null)
+			{
+				while (_scanResults.TryDequeue(out var result))
+				{
+					if (result.Modified)
+					{
+						PendingWrites.Add(result);
+					}
+					else
+					{
+						PendingObjBranch.Add(result.Path);
 					}
 				}
+			}
 
-				if (reimportPaths.Count > 0)
+			foreach (var obj in PendingSceneObjects)
+			{
+				if (obj != null)
 				{
-					foreach (var p in reimportPaths)
+					SceneApplyQueue.Add(obj);
+				}
+			}
+			PendingSceneObjects.Clear();
+
+			_scanResults = null;
+			_scanTask = null;
+			DisposeCts();
+			_state = SRProcessingState.Applying;
+		}
+
+		private static void StepApply()
+		{
+			var settings = Settings;
+			long budgetMs = settings.ProcessingFrameBudgetMs;
+			var sw = Stopwatch.StartNew();
+
+			while (PendingWrites.Count > 0 && sw.ElapsedMilliseconds < budgetMs)
+			{
+				var result = PendingWrites[^1];
+				PendingWrites.RemoveAt(PendingWrites.Count - 1);
+				try
+				{
+					File.WriteAllText(result.Path, result.NewContent);
+					ReimportQueue.Add(result.Path);
+				}
+				catch (Exception e)
+				{
+					Debug.LogError($"SRProcessingCoordinator write error: {e}");
+				}
+			}
+
+			bool wantClearMissing = settings.ClearMissingReferencesIfNoReplacement;
+			bool wantDuplicateClean = settings.DuplicateMode != SRDuplicateMode.Default;
+
+			while (PendingObjBranch.Count > 0 && sw.ElapsedMilliseconds < budgetMs)
+			{
+				var path = PendingObjBranch[^1];
+				PendingObjBranch.RemoveAt(PendingObjBranch.Count - 1);
+
+				if (!wantClearMissing && !wantDuplicateClean)
+					continue;
+
+				var asset = AssetDatabase.LoadAssetAtPath<Object>(path);
+				if (asset == null)
+					continue;
+
+				bool cleaned = false;
+				bool cleared = false;
+				if (wantDuplicateClean)
+				{
+					cleaned = SRDuplicateCleaner.TryCleanupObject(asset, settings.DuplicateMode);
+				}
+
+				if (wantClearMissing)
+				{
+					TypeReplacer.TryClearMissingReferences(asset, out cleared);
+				}
+
+				if (cleaned || cleared)
+				{
+					EditorUtility.SetDirty(asset);
+					DirtyAssets.Add(asset);
+				}
+			}
+
+			while (SceneApplyQueue.Count > 0 && sw.ElapsedMilliseconds < budgetMs)
+			{
+				var obj = SceneApplyQueue[^1];
+				SceneApplyQueue.RemoveAt(SceneApplyQueue.Count - 1);
+				if (obj == null)
+					continue;
+
+				ProcessSceneObject(obj, settings);
+			}
+
+			if (ReimportQueue.Count > 0 && sw.ElapsedMilliseconds < budgetMs)
+			{
+				int chunk = settings.ProcessingBatchSize;
+				int n = 0;
+				AssetDatabase.StartAssetEditing();
+				try
+				{
+					while (ReimportQueue.Count > 0 && n < chunk && sw.ElapsedMilliseconds < budgetMs)
+					{
+						var p = ReimportQueue[^1];
+						ReimportQueue.RemoveAt(ReimportQueue.Count - 1);
 						InFlightImports.Add(p);
-
-					int reimported = 0;
-					foreach (var p in reimportPaths)
-					{
-						AssetDatabase.ImportAsset(p, ImportAssetOptions.ForceSynchronousImport);
-						reimported++;
-						if (reimported >= batchSize)
-							break;
+						AssetDatabase.ImportAsset(p);
+						n++;
 					}
 				}
+				finally
+				{
+					AssetDatabase.StopAssetEditing();
+				}
+			}
 
-				if (dirtyAssets.Count > 0)
+			bool applyDone = PendingWrites.Count == 0
+				&& PendingObjBranch.Count == 0
+				&& SceneApplyQueue.Count == 0
+				&& ReimportQueue.Count == 0;
+
+			if (!applyDone)
+				return;
+
+			if (DirtyAssets.Count > 0)
+			{
+				AssetDatabase.SaveAssets();
+				DirtyAssets.Clear();
+			}
+
+			_state = SRProcessingState.Idle;
+		}
+
+		private static void ProcessSceneObject(Object obj, SREditorSettings settings)
+		{
+			string scenePath = string.Empty;
+			if (obj is Component c && c.gameObject.scene.IsValid())
+			{
+				scenePath = c.gameObject.scene.path;
+			}
+			else if (obj is GameObject go && go.scene.IsValid())
+			{
+				scenePath = go.scene.path;
+			}
+
+			TypeReplacer.TryClearMissingReferences(obj, out bool cleared);
+			bool cleaned = SRDuplicateCleaner.TryCleanupObject(obj, settings.DuplicateMode);
+
+			if ((cleared || cleaned) && !string.IsNullOrEmpty(scenePath))
+			{
+				var scene = SceneManager.GetSceneByPath(scenePath);
+				if (scene.IsValid())
 				{
-					AssetDatabase.SaveAssets();
-				}
-				// If there is still work pending, schedule another batch
-				if (PendingAssetPaths.Count > 0 || PendingSceneObjects.Count > 0)
-				{
-					ScheduleProcessing();
+					EditorSceneManager.MarkSceneDirty(scene);
 				}
 			}
-			catch (Exception e)
+		}
+
+		private static void OnBeforeAssemblyReload()
+		{
+			CancelScan();
+		}
+
+		private static void OnPlayModeStateChanged(PlayModeStateChange change)
+		{
+			if (change == PlayModeStateChange.ExitingEditMode)
 			{
-				Debug.LogError($"SRProcessingCoordinator error: {e}");
+				CancelScan();
 			}
-			finally
+		}
+
+		private static void CancelScan()
+		{
+			if (_scanCts != null)
 			{
-				_isProcessing = false;
+				_scanCts.Cancel();
+			}
+		}
+
+		private static void DisposeCts()
+		{
+			if (_scanCts != null)
+			{
+				_scanCts.Dispose();
+				_scanCts = null;
 			}
 		}
 	}
