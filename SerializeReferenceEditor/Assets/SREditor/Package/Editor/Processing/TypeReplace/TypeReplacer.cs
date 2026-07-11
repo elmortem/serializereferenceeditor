@@ -42,5 +42,17 @@ namespace SerializeReferenceEditor.Editor.Processing.TypeReplace
 
 			return clearedMissingReferences;
 		}
+
+		public static bool ClearMissingOn(Object target)
+		{
+			if (target == null)
+				return false;
+
+			if (!SerializationUtility.HasManagedReferencesWithMissingTypes(target))
+				return false;
+
+			SerializationUtility.ClearAllManagedReferencesWithMissingTypes(target);
+			return true;
+		}
 	}
 }

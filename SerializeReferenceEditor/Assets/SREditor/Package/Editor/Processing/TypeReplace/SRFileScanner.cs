@@ -8,10 +8,14 @@ namespace SerializeReferenceEditor.Editor.Processing.TypeReplace
 		public static SRFileScanResult Scan(string path, IReadOnlyList<SRReplacementPattern> patterns)
 		{
 			if (string.IsNullOrEmpty(path))
-				return new SRFileScanResult(path, false, null);
+			{
+				return new SRFileScanResult(path, false, null, default);
+			}
 
 			if (!File.Exists(path))
-				return new SRFileScanResult(path, false, null);
+			{
+				return new SRFileScanResult(path, false, null, default);
+			}
 
 			string content;
 			try
@@ -20,7 +24,7 @@ namespace SerializeReferenceEditor.Editor.Processing.TypeReplace
 			}
 			catch
 			{
-				return new SRFileScanResult(path, false, null);
+				return new SRFileScanResult(path, false, null, default);
 			}
 
 			bool modified = false;
@@ -33,7 +37,8 @@ namespace SerializeReferenceEditor.Editor.Processing.TypeReplace
 				}
 			}
 
-			return new SRFileScanResult(path, modified, modified ? content : null);
+			var verdict = SRVerdictScanner.Analyze(content);
+			return new SRFileScanResult(path, modified, modified ? content : null, verdict);
 		}
 	}
 }

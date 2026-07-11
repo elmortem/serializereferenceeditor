@@ -44,6 +44,7 @@ namespace SerializeReferenceEditor.Editor.Settings
 						EditorGUILayout.PropertyField(settings.FindProperty("_processingBatchSize"), new GUIContent("Batch Size", "How many assets/objects to process per tick"));
 						EditorGUILayout.PropertyField(settings.FindProperty("_processingFrameBudgetMs"), new GUIContent("Frame Budget (ms)", "Per-frame time budget for the main-thread apply stage"));
 						EditorGUILayout.PropertyField(settings.FindProperty("_processingMaxThreads"), new GUIContent("Max Scan Threads", "Max worker threads for the background text-replacement scan"));
+						EditorGUILayout.PropertyField(settings.FindProperty("_processingImportChunkKb"), new GUIContent("Import Chunk (KB)", "Max total size of files reimported in one chunk"));
 
 						EditorGUILayout.Space();
 						EditorGUILayout.LabelField("Type Replacement & Cleanup", EditorStyles.boldLabel);
@@ -51,7 +52,7 @@ namespace SerializeReferenceEditor.Editor.Settings
 
 						EditorGUILayout.Space();
 						EditorGUILayout.LabelField("Duplicate Handling", EditorStyles.boldLabel);
-						EditorGUILayout.PropertyField(settings.FindProperty("_duplicateMode"), new GUIContent("Mode", "How to handle duplicate managed references"));
+						EditorGUILayout.PropertyField(settings.FindProperty("_duplicateMode"), new GUIContent("Mode", "How to handle duplicate managed references. None disables duplicate cleaning"));
 
 						EditorGUILayout.Space();
 						EditorGUILayout.LabelField("Change Detection Sources", EditorStyles.boldLabel);

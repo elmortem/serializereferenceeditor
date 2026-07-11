@@ -1,5 +1,41 @@
 # Change Log
 
+## [1.5.1]
+
+- Processing pipeline rework: text-based verdict prefilter on worker threads, background file writing via temp + replace, per-frame clean slicing — a no-op pass now costs ~zero on the main thread
+- Add `SRDuplicateMode.None` to disable duplicate cleaning; `Default` is now the active strategy everywhere
+- Add "Import Chunk (KB)" processing setting for byte-based reimport chunking
+
+## [1.5.0]
+
+- New FormerlySerializeType processor
+
+## [1.4.5]
+
+- Fix SRDemo-Editor platforms
+
+## [1.4.4]
+
+- Add copy, paste, and cut actions for managed references
+
+## [1.4.3]
+
+- Fixes
+
+## [1.4.2]
+
+- Processing optimize
+
+## [1.4.1]
+
+- Fixes
+
+## [1.4.0]
+
+- Change editor namespace
+- New tools: Missing types cleaner, Missing types logger, Type replace tool
+- New asset processing on change: Double cleaner, Type replacer (FormerlySerializeType)
+
 ## [1.3.14]
 
 - Change CreateAssetMenu path for SRMissingTypesValidatorConfig

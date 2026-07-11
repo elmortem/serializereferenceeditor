@@ -12,6 +12,9 @@ namespace SerializeReferenceEditor.Editor.Processing.DoubleClean
     {
         public static bool TryCleanupObject(Object asset, SRDuplicateMode duplicateMode)
         {
+            if (duplicateMode == SRDuplicateMode.None)
+                return false;
+
             if (asset == null)
                 return false;
 
@@ -24,22 +27,35 @@ namespace SerializeReferenceEditor.Editor.Processing.DoubleClean
                 {
                     if (component == null)
                         continue;
-                    anyChanged |= ProcessSerializedObject(new SerializedObject(component), duplicateMode, seenObjects);
+
+                    anyChanged |= TryCleanupTarget(component, duplicateMode, seenObjects);
                 }
             }
             else
             {
-                try
-                {
-                    anyChanged |= ProcessSerializedObject(new SerializedObject(asset), duplicateMode, seenObjects);
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogError(ex);
-                }
+                anyChanged |= TryCleanupTarget(asset, duplicateMode, seenObjects);
             }
 
             return anyChanged;
+        }
+
+        public static bool TryCleanupTarget(Object target, SRDuplicateMode duplicateMode, HashSet<object> seenObjects)
+        {
+            if (duplicateMode == SRDuplicateMode.None)
+                return false;
+
+            if (target == null)
+                return false;
+
+            try
+            {
+                return ProcessSerializedObject(new SerializedObject(target), duplicateMode, seenObjects);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(ex);
+                return false;
+            }
         }
 
         private static bool ProcessSerializedObject(SerializedObject serializedObject, SRDuplicateMode duplicateMode, HashSet<object> seenObjects)

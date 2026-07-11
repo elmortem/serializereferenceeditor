@@ -4,6 +4,8 @@ namespace SerializeReferenceEditor.Editor.Processing
 	{
 		Idle,
 		Scanning,
+		Classifying,
+		Writing,
 		Applying
 	}
 }

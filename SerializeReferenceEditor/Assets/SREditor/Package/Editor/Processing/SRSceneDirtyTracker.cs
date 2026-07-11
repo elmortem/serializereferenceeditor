@@ -1,32 +1,43 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace SerializeReferenceEditor.Editor.Processing
 {
 	public static class SRSceneDirtyTracker
 	{
 		private static readonly HashSet<string> ActiveScenes = new();
-		private static readonly Dictionary<string, HashSet<int>> DirtyRoots = new();
+		private static readonly Dictionary<string, HashSet<int>> DirtyObjects = new();
+		private static readonly HashSet<int> Empty = new();
 
-		public static void MarkDirty(GameObject root)
+		public static void MarkDirty(Object changedObject)
 		{
-			if (root == null)
+			if (changedObject == null)
 				return;
 
-			var scene = root.scene;
+			var go = changedObject as GameObject;
+			if (go == null && changedObject is Component component)
+			{
+				go = component.gameObject;
+			}
+
+			if (go == null)
+				return;
+
+			var scene = go.scene;
 			if (!scene.IsValid())
 				return;
 
 			if (string.IsNullOrEmpty(scene.path))
 				return;
 
-			if (!DirtyRoots.TryGetValue(scene.path, out var set))
+			if (!DirtyObjects.TryGetValue(scene.path, out var set))
 			{
 				set = new HashSet<int>();
-				DirtyRoots[scene.path] = set;
+				DirtyObjects[scene.path] = set;
 			}
 
-			set.Add(root.GetInstanceID());
+			set.Add(changedObject.GetInstanceID());
 		}
 
 		public static bool ShouldProcessAll(string scenePath)
@@ -34,9 +45,9 @@ namespace SerializeReferenceEditor.Editor.Processing
 			return !ActiveScenes.Contains(scenePath);
 		}
 
-		public static bool IsRootDirty(string scenePath, int rootInstanceId)
+		public static IReadOnlyCollection<int> GetDirtyObjectIds(string scenePath)
 		{
-			return DirtyRoots.TryGetValue(scenePath, out var set) && set.Contains(rootInstanceId);
+			return DirtyObjects.TryGetValue(scenePath, out var set) ? set : Empty;
 		}
 
 		public static void OnProcessed(string scenePath)
@@ -45,7 +56,7 @@ namespace SerializeReferenceEditor.Editor.Processing
 				return;
 
 			ActiveScenes.Add(scenePath);
-			if (DirtyRoots.TryGetValue(scenePath, out var set))
+			if (DirtyObjects.TryGetValue(scenePath, out var set))
 			{
 				set.Clear();
 			}
@@ -57,7 +68,7 @@ namespace SerializeReferenceEditor.Editor.Processing
 				return;
 
 			ActiveScenes.Remove(scenePath);
-			DirtyRoots.Remove(scenePath);
+			DirtyObjects.Remove(scenePath);
 		}
 	}
 }

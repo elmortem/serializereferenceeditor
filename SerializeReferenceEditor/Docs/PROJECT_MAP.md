@@ -101,33 +101,40 @@ Assets/SREditor/
 - **`SREditorSettings`** : `ScriptableObject` — синглтон, сериализуется в `ProjectSettings/SREditorSettings.json` (не в Assets). Поля `internal` с публичными свойствами-геттерами:
   - Отображение: `ShowNameType`, `NameSeparators`.
   - Триггеры авто-обработки: `FormerlySerializedTypeOnAssetImport/OnAssetSelect/OnSceneSave`, `ProcessScenesOnOpen`.
-  - Обработка: `ProcessingBatchSize`, `ProcessingFrameBudgetMs` (кадровый бюджет Apply), `ProcessingMaxThreads` (воркеры скана).
+  - Обработка: `ProcessingBatchSize` (макс. файлов в чанке реимпорта), `ProcessingFrameBudgetMs` (кадровый бюджет Classify/Apply), `ProcessingMaxThreads` (воркеры скана), `ProcessingImportChunkKb` (макс. суммарный размер файлов в одном чанке реимпорта, дефолт 4096).
   - Очистка/дубликаты: `ClearMissingReferencesIfNoReplacement`, `DuplicateMode`.
   - Источники детектора изменений: `DoubleCleanOnEditorUpdate/OnUndoRedo/OnAssetSave`, `ChangeDetectorPollIntervalMs` (троттлинг опроса на update).
   - Инструменты: `MissingTypesAssetFilter`.
   - `[InitializeOnLoadMethod] Initialize()` пробрасывает флаги в `AssetChangeDetector.Initialize(...)`.
 - **`SREditorSettingsProvider`** : `SettingsProvider` — UI на странице `Project/Serialize Reference Editor`, на изменение зовёт `SaveSettings()`.
-- Enum-ы: **`ShowNameType`** (FullName/OnlyNameSpace/OnlyCurrentType), **`SRDuplicateMode`** (Default/Copy/Null).
+- Enum-ы: **`ShowNameType`** (FullName/OnlyNameSpace/OnlyCurrentType), **`SRDuplicateMode`** (Default/Copy/Null/None). `Default` — активная стратегия (замена на default-значение), `None` — очистка дублей выключена. `None` добавлен в конец (int 3), чтобы не сломать сериализованные настройки.
 - Пункт меню `Tools/SREditor/Settings` открывает страницу.
 
 ### Авто-обработка (`Processing/`)
 
-- **`ProcessingCoordinator`** : `AssetPostprocessor` — оркестратор, машина состояний `Idle → Scanning → Applying` (`SRProcessingState`), которую крутит единый насос на `EditorApplication.update` (подписка только когда есть работа). `[InitializeOnLoadMethod]` подписывается на: выбор объекта, сохранение/открытие сцены, `AssetChangeDetector.ChangeEvent`, `AssemblyReloadEvents.beforeAssemblyReload`, `playModeStateChanged`. Триггеры (`OnPostprocessAllAssets`, `OnSelectionChanged`, `OnSceneOpened`, `OnAssetChanged`) кладут пути/объекты в очереди `PendingAssetPaths`/`PendingSceneObjects` и поднимают насос. Защита от рекурсии реимпорта — `InFlightImports`.
-  - **Scanning** — `SnapshotPatterns` сворачивает замены в `SRReplacementPattern` на главном потоке, дальше `Task.Run` + `Parallel.ForEach` (`ProcessingMaxThreads`) гоняет `SRFileScanner.Scan` по путям: каждый файл читается один раз, все паттерны применяются в памяти (`TypeReplaceHelper.ApplyReplacement`). Воркеры не трогают Unity API.
-  - **Applying** — `StepApply` по кадрам в пределах `ProcessingFrameBudgetMs`: пишет изменённые файлы, грузит ассеты для obj-веток (дубликаты/missing), обрабатывает объекты сцены, реимпортирует чанками (`ProcessingBatchSize`) под `StartAssetEditing`/`StopAssetEditing` без `ForceSynchronousImport`, в конце `SaveAssets`.
-  - **Отмена** — `CancellationTokenSource`, гасится в `beforeAssemblyReload` и при выходе в play-mode; насос простаивает в play-mode.
-  - `OnSceneSaving` остаётся синхронным (`SerializedObject`/`SerializationUtility`), но через `SRSceneDirtyTracker` обрабатывает только грязные корни (первый сейв сцены в сессии — полный проход).
-  - **TDD рефакторинга в async-пайплайн**: `Docs/tdd/260626-1511-TDD-processing_coordinator_async_pipeline.md` (статус «Выполнено»).
-- **`SRProcessingState`** (enum) — `Idle`/`Scanning`/`Applying`.
-- **`SRSceneDirtyTracker`** (static) — трекинг грязных корней сцены: `MarkDirty`/`IsRootDirty`/`ShouldProcessAll`/`OnProcessed`/`Reset`. Источник пометок — `OnAssetChanged` (изменения выделенных объектов/undo).
+- **`ProcessingCoordinator`** : `AssetPostprocessor` — оркестратор, машина состояний `Idle → Scanning → Classifying → Writing → Applying` (`SRProcessingState`), которую крутит единый насос на `EditorApplication.update` (подписка только когда есть работа). `[InitializeOnLoadMethod]` подписывается на: выбор объекта, сохранение/открытие сцены, `AssetChangeDetector.ChangeEvent`, `AssemblyReloadEvents.beforeAssemblyReload`, `playModeStateChanged`. Триггеры (`OnPostprocessAllAssets`, `OnSelectionChanged`, `OnSceneOpened`, `OnAssetChanged`) кладут пути/объекты в очереди `PendingAssetPaths`/`PendingSceneObjects` и поднимают насос. Защита от рекурсии реимпорта — `InFlightImports`.
+  - **Ключевой принцип** — no-op проход стоит ~ноль на главном потоке: вся проверка «есть ли что делать» выполняется текстом на воркерах (вердикт), скан запускается **всегда** (даже при пустом списке паттернов), реальная работа режется на мелкие шаги под кадровый бюджет, запись файлов уходит в фон.
+  - **Scanning** — `SnapshotPatterns` сворачивает замены в `SRReplacementPattern` на главном потоке, дальше `Task.Run` + `Parallel.ForEach` (`ProcessingMaxThreads`) гоняет `SRFileScanner.Scan` по путям: файл читается один раз, применяются все паттерны (`TypeReplaceHelper.ApplyReplacement`), по финальному контенту считается вердикт (`SRVerdictScanner`). Воркеры не трогают Unity API.
+  - **Classifying** — `StepClassify` по кадрам разбирает вердикты: изменённые файлы → `PendingWrites` (и в `NeedsCleanAfterImport`, если вердикт требует чистки); неизменённые, но требующие чистки (`NeedsObjectClean`: дубли rid, нераспарсенные/missing-триплеты через `SRTypeResolveCache`) → `PendingObjBranch`; остальные — отброс. Только словарные лукапы в бюджете, никаких `LoadAssetAtPath`.
+  - **Writing** — если есть записи, `StartWrites` на воркере пишет через временный `.srtmp` + `File.Replace`/`Move`: полузаписанных ассетов не остаётся ни при отмене, ни при domain reload. Результаты (путь + размер) стекаются в `SRImportItem`.
+  - **Applying** — `StepApply` по кадрам в пределах `ProcessingFrameBudgetMs`: `LoadAssetAtPath` для obj-веток (один за проход), развёртка в `SRCleanStep`/`SRCleanGroup` (по компоненту за шаг, dup-шаги делят один `seenObjects` на GameObject), выполнение шагов, реимпорт чанками по суммарным байтам (`ProcessingImportChunkKb`) и числу (`ProcessingBatchSize`) под `StartAssetEditing`/`StopAssetEditing`, в конце — поштучный `SaveAssetIfDirty` (`DirtyAssets`). `Idle` с одними `PendingSceneObjects` переходит сразу в Applying.
+  - **Отмена** — `CancellationTokenSource` (`CancelProcessing` гасит и скан, и запись), срабатывает в `beforeAssemblyReload` и при выходе в play-mode; насос простаивает в play-mode.
+  - `OnSceneSaving` остаётся синхронным (`SerializedObject`/`SerializationUtility`), но через `SRSceneDirtyTracker` обрабатывает только точечно изменённые объекты, сгруппированные по GameObject с общим `seenObjects` (первый сейв сцены в сессии — полный проход).
+  - **TDD**: `Docs/tdd/260626-1511-TDD-processing_coordinator_async_pipeline.md` (async-пайплайн) и `Docs/tdd/260711-1734-TDD-processing_invisible_pipeline.md` (незаметный пайплайн: префильтр вердиктов, фоновая запись, слайсинг клинеров) — оба «Выполнено».
+- **`SRProcessingState`** (enum) — `Idle`/`Scanning`/`Classifying`/`Writing`/`Applying`.
+- **`SRSceneDirtyTracker`** (static) — точечный трекинг грязных объектов сцены (instanceID компонента/GameObject, не корней): `MarkDirty(Object)`/`GetDirtyObjectIds`/`ShouldProcessAll`/`OnProcessed`/`Reset`. Источник пометок — `OnAssetChanged` (изменения выделенных объектов/undo).
+- **`SRCleanStep`/`SRCleanGroup`/`SRCleanStepKind`** — единица отложенной очистки: `SRCleanStep` (цель + вид `Duplicate`/`Missing` + shared `seenObjects` + группа), `SRCleanGroup` (корень/сцена, счётчик `Remaining`, флаг `AnyChanged`; при завершении с изменениями дертит ассет или сцену). `SRImportItem` (readonly struct) — путь + размер файла для чанкования реимпорта.
 - `TypeReplace/`:
-  - **`TypeReplacer`** (static) — `TryClearMissingReferences(obj, out cleared)`: на загруженном `obj` чистит missing managed references (главный поток), если `ClearMissingReferencesIfNoReplacement`. Текстовая ветка вынесена в пайплайн.
+  - **`TypeReplacer`** (static) — `TryClearMissingReferences(obj, out cleared)` (чистит missing managed references на `GameObject`/`ScriptableObject`, гейт `ClearMissingReferencesIfNoReplacement`) и `ClearMissingOn(target)` (прямая очистка одного объекта без проверки настроек — гейт на вызывающей стороне).
   - **`TypeReplaceHelper`** (static) — `ApplyReplacement(content, pattern, out wasModified)`: чистая строковая трансформация (ни `File.*`, ни `AssetDatabase.*`), регексами заменяет тип в трёх местах (`references: RefIds`, `type: {class,ns,asm}`, `managedReferences[...]`) по разобранному `SRReplacementPattern`.
   - **`SRReplacementPattern`** (readonly struct) — иммутабельный снимок одного маппинга с уже разобранными частями типа (`OldClassName`/`OldNamespace`/`OldAssembly` + new-аналоги). Фабрика `Parse(oldTypePattern, newTypePattern)` разбирает строки один раз на главном потоке.
-  - **`SRFileScanner`** (static) — потокобезопасный `Scan(path, patterns)`: читает файл один раз, прогоняет все паттерны, возвращает `SRFileScanResult`. Исключения трактуются как «не изменён».
-  - **`SRFileScanResult`** (readonly struct) — `Path`/`Modified`/`NewContent` (контент только при `Modified`).
+  - **`SRFileScanner`** (static) — потокобезопасный `Scan(path, patterns)`: читает файл один раз, прогоняет все паттерны, считает вердикт по финальному контенту, возвращает `SRFileScanResult`. Исключения трактуются как «не изменён».
+  - **`SRFileScanResult`** (readonly struct) — `Path`/`Modified`/`NewContent` (контент только при `Modified`) + `Verdict`.
+  - **`SRVerdictScanner`** (static) — потокобезопасный однопроходный построчный анализ YAML без Unity API (`AsSpan`/`Slice`, без аллокаций на строку): считает `SRFileVerdict` (`HasManagedReferences`/`HasDuplicateRids`/`HasUnparsableTypes` + список `SRTypeTriple`). Счётчики использований rid — на документ; нераспарсенный триплет/generic-имя — консервативный кандидат.
+  - **`SRFileVerdict`** (readonly struct), **`SRTypeTriple`** (readonly struct, ключ кэша: класс/ns/asm, нормализованы к пустой строке).
+  - **`SRTypeResolveCache`** (static, **только главный поток**) — `IsMissing(triple)`: резолвит тип через `AppDomain` и кэширует результат. Статика сбрасывается при domain reload (новые типы требуют рекомпиляции → кэш инвалидируется автоматически).
 - `DoubleClean/`:
-  - **`SRDuplicateCleaner`** (static) — `TryCleanupObject(asset, mode)`: обходит `SerializedObject` (для `GameObject` — по всем компонентам), ищет повторно встреченные managed-ссылки (один и тот же объект в нескольких полях) и по `SRDuplicateMode` зануляет / ставит default / делает deep copy (`CreateDeepCopy` рекурсивно копирует поля с `[SerializeReference]`).
+  - **`SRDuplicateCleaner`** (static) — `TryCleanupObject(asset, mode)` (для `GameObject` — по всем компонентам с общим `seenObjects`) и `TryCleanupTarget(target, mode, seenObjects)` (один объект с внешним shared-набором). При `SRDuplicateMode.None` — ранний выход. По `SRDuplicateMode` повторно встреченную managed-ссылку зануляет / ставит default / делает deep copy (`CreateDeepCopy` рекурсивно копирует поля с `[SerializeReference]`).
 
 ### Детектор изменений
 
@@ -153,10 +160,11 @@ Assets/SREditor/
 `SRDrawer.OnGUI` → `SRTypeCache.GetTypeInfos` (сканирование+кэш наследников) → `DropdownButton` → `ShowTypeSelectionMenu` → `SRCashTypeSearchTree.GetTypeTreeFactory` → `SRTypesSearchWindowProvider` (дерево + действия) → выбор пункта → `BaseSRAction.Apply` (`InstanceClassSRAction` создаёт экземпляр / `Erase` / clipboard-команды).
 
 **Авто-замена переименованного типа:**
-изменение/импорт ассета → `AssetChangeDetector.ChangeEvent` или `OnPostprocessAllAssets` → `ProcessingCoordinator` (очередь, насос на `update`) → Scanning (`SnapshotPatterns` → `SRReplacementPattern` → `Parallel.ForEach` `SRFileScanner.Scan` + `TypeReplaceHelper.ApplyReplacement` на воркер-нитях) → Applying (запись файлов и реимпорт чанками по кадровому бюджету).
+изменение/импорт ассета → `AssetChangeDetector.ChangeEvent` или `OnPostprocessAllAssets` → `ProcessingCoordinator` (очередь, насос на `update`) → Scanning (`SnapshotPatterns` → `SRReplacementPattern` → `Parallel.ForEach` `SRFileScanner.Scan` + `TypeReplaceHelper.ApplyReplacement` + `SRVerdictScanner` на воркер-нитях) → Classifying (вердикты → `PendingWrites`/`PendingObjBranch`/отброс) → Writing (фоновая запись через temp+`Replace`) → Applying (реимпорт чанками по байтам, затем поштучный `SaveAssetIfDirty` по кадровому бюджету).
 
 **Очистка дубликатов/missing:**
-сохранение сцены/ассета → `ProcessingCoordinator` → `SRDuplicateCleaner.TryCleanupObject` (по `SRDuplicateMode`) и/или `SerializationUtility.ClearAllManagedReferencesWithMissingTypes`.
+- сейв сцены → `ProcessingCoordinator.OnSceneSaving` → полный проход (первый сейв в сессии) либо точечно по `SRSceneDirtyTracker.GetDirtyObjectIds` → `SRDuplicateCleaner.TryCleanupTarget` / `TypeReplacer.ClearMissingOn`.
+- сейв/импорт ассета → пайплайн: вердикт на воркере → obj-ветка в Applying → развёртка в `SRCleanStep` → `SRDuplicateCleaner.TryCleanupTarget` (по `SRDuplicateMode`) и/или `TypeReplacer.ClearMissingOn` → `SaveAssetIfDirty`.
 
 ## Демо (`Samples/Demo`)
 
@@ -169,6 +177,6 @@ Assets/SREditor/
 ## Документация
 
 - `Docs/PROJECT_MAP.md` — этот файл.
-- `Docs/tdd/` — технические задания (текущее: async-пайплайн `ProcessingCoordinator`).
+- `Docs/tdd/` — технические задания (текущее: незаметный пайплайн `ProcessingCoordinator` — префильтр вердиктов, фоновая запись, слайсинг клинеров).
 - `Docs/notes/` — заметки.
 - `CHANGELOG.md`, `Assets/SREditor/README.pdf`.
