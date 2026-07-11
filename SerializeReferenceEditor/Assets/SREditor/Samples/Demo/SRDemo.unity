@@ -495,6 +495,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5370488343339443315, guid: 2cfca8517d037415ba308930afe49802, type: 3}
+      propertyPath: managedReferences[8191843295340527630].Str
+      value: test
+      objectReference: {fileID: 0}
+    - target: {fileID: 5370488343339443315, guid: 2cfca8517d037415ba308930afe49802, type: 3}
       propertyPath: managedReferences[8191843295340527633].Int
       value: 83
       objectReference: {fileID: 0}
