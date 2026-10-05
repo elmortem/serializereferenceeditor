@@ -250,8 +250,12 @@ namespace SerializeReferenceEditor.Editor.Processing
 
 			foreach (var id in ids)
 			{
+#if UNITY_6000_5_OR_NEWER
+                var obj = EditorUtility.EntityIdToObject(id);
+#else
 				var obj = EditorUtility.InstanceIDToObject(id);
-				if (obj == null)
+#endif
+                if (obj == null)
 					continue;
 
 				var go = obj as GameObject;

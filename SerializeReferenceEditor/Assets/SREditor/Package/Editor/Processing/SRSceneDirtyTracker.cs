@@ -7,10 +7,15 @@ namespace SerializeReferenceEditor.Editor.Processing
 	public static class SRSceneDirtyTracker
 	{
 		private static readonly HashSet<string> ActiveScenes = new();
+#if UNITY_6000_5_OR_NEWER
+        private static readonly Dictionary<string, HashSet<EntityId>> DirtyObjects = new();
+        private static readonly HashSet<EntityId> Empty = new();
+#else
 		private static readonly Dictionary<string, HashSet<int>> DirtyObjects = new();
 		private static readonly HashSet<int> Empty = new();
+#endif
 
-		public static void MarkDirty(Object changedObject)
+        public static void MarkDirty(Object changedObject)
 		{
 			if (changedObject == null)
 				return;
@@ -33,24 +38,32 @@ namespace SerializeReferenceEditor.Editor.Processing
 
 			if (!DirtyObjects.TryGetValue(scene.path, out var set))
 			{
-				set = new HashSet<int>();
+				set = new();
 				DirtyObjects[scene.path] = set;
 			}
 
+#if UNITY_6000_5_OR_NEWER
+            set.Add(changedObject.GetEntityId());
+#else
 			set.Add(changedObject.GetInstanceID());
-		}
+#endif
+        }
 
-		public static bool ShouldProcessAll(string scenePath)
+        public static bool ShouldProcessAll(string scenePath)
 		{
 			return !ActiveScenes.Contains(scenePath);
 		}
 
+#if UNITY_6000_5_OR_NEWER
+        public static IReadOnlyCollection<EntityId> GetDirtyObjectIds(string scenePath)
+#else
 		public static IReadOnlyCollection<int> GetDirtyObjectIds(string scenePath)
-		{
-			return DirtyObjects.TryGetValue(scenePath, out var set) ? set : Empty;
-		}
+#endif
+        {
+            return DirtyObjects.TryGetValue(scenePath, out var set) ? set : Empty;
+        }
 
-		public static void OnProcessed(string scenePath)
+        public static void OnProcessed(string scenePath)
 		{
 			if (string.IsNullOrEmpty(scenePath))
 				return;
