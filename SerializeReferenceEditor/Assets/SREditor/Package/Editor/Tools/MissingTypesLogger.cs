@@ -60,7 +60,12 @@ namespace SerializeReferenceEditor.Editor.Tools
                                             stringBuilder.AppendFormat("Object \"{0}\" (Type: {1}, Instance: {2})",
                                                     component.name,
                                                     component.GetType().FullName,
-                                                    component.GetInstanceID())
+#if UNITY_6000_5_OR_NEWER
+                                                    component.GetEntityId()
+#else
+                                                    component.GetInstanceID()
+#endif
+                                                 )
                                                 .AppendLine();
 
                                             foreach (var missingType in missingTypes)
@@ -99,7 +104,12 @@ namespace SerializeReferenceEditor.Editor.Tools
 										stringBuilder.AppendFormat("Object \"{0}\" (Type: {1}, Instance: {2})",
                                                 scriptable.name,
                                                 scriptable.GetType().FullName,
-                                                scriptable.GetInstanceID())
+#if UNITY_6000_5_OR_NEWER
+                                                scriptable.GetEntityId()
+#else
+                                                scriptable.GetInstanceID()
+#endif
+                                            )
                                             .AppendLine();
 
                                         foreach (var missingType in missingTypes)
